@@ -966,6 +966,15 @@ newChatButton.addEventListener(
     createNewChat
 );
 
+// ========================================
+// SEND BUTTON
+// ========================================
+
+sendButton.addEventListener(
+    "click",
+    sendMessage
+);
+
 
 // ========================================
 // LOGOUT
