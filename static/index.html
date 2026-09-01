@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>M3NOVA AI</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+
+</head>
+
+<body>
+
+<!-- BACKGROUND -->
+
+<div class="background">
+
+    <div class="orb orb-one"></div>
+
+    <div class="orb orb-two"></div>
+
+    <div class="grid"></div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- AUTH SCREEN -->
+<!-- ========================= -->
+
+<div
+    class="auth-screen"
+    id="authScreen"
+>
+
+    <div class="auth-card">
+
+        <div class="auth-logo">
+            M3
+        </div>
+
+        <h1>
+            Welcome to
+            <span>M3NOVA</span>
+        </h1>
+
+        <p class="auth-subtitle">
+            Premium Artificial Intelligence
+        </p>
+
+
+        <!-- LOGIN -->
+
+        <div
+            class="auth-form"
+            id="loginForm"
+        >
+
+            <input
+                type="text"
+                id="loginUsername"
+                placeholder="Username"
+                autocomplete="username"
+            >
+
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="Password"
+                autocomplete="current-password"
+            >
+
+            <button
+                id="loginButton"
+                class="auth-button"
+            >
+                Sign In
+            </button>
+
+            <p class="auth-switch">
+
+                Don't have an account?
+
+                <button
+                    type="button"
+                    id="showSignup"
+                >
+                    Sign Up
+                </button>
+
+            </p>
+
+        </div>
+
+
+        <!-- SIGNUP -->
+
+        <div
+            class="auth-form hidden"
+            id="signupForm"
+        >
+
+            <input
+                type="text"
+                id="signupUsername"
+                placeholder="Choose username"
+                autocomplete="username"
+            >
+
+            <input
+                type="password"
+                id="signupPassword"
+                placeholder="Create password"
+                autocomplete="new-password"
+            >
+
+            <button
+                id="signupButton"
+                class="auth-button"
+            >
+                Create Account
+            </button>
+
+            <p class="auth-switch">
+
+                Already have an account?
+
+                <button
+                    type="button"
+                    id="showLogin"
+                >
+                    Sign In
+                </button>
+
+            </p>
+
+        </div>
+
+
+        <div
+            class="auth-message"
+            id="authMessage"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- MAIN APP -->
+<!-- ========================= -->
+
+<div
+    class="app hidden"
+    id="app"
+>
+
+
+    <!-- ========================= -->
+    <!-- HEADER -->
+    <!-- ========================= -->
+
+    <header class="header">
+
+        <div class="brand">
+
+            <div class="logo">
+                M3
+            </div>
+
+            <div class="brand-text">
+
+                <div class="brand-name">
+                    M3NOVA
+                </div>
+
+                <div class="brand-status">
+
+                    <span class="status-dot"></span>
+
+                    Premium AI
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- HEADER BUTTONS -->
+
+        <div class="header-right">
+
+            <button
+                class="header-button new-chat-button"
+                id="newChatButton"
+            >
+                ＋ New Chat
+            </button>
+
+
+            <button
+                class="header-button history-button"
+                id="historyButton"
+            >
+                ☰ Chats
+            </button>
+
+
+            <div
+                class="user-info"
+                id="userInfo"
+            >
+                User
+            </div>
+<button
+                class="logout-button"
+                id="logoutButton"
+                title="Logout"
+            >
+                Logout
+            </button>
+
+
+            <div class="online">
+
+                <span></span>
+
+                ONLINE
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- ========================= -->
+    <!-- APP CONTENT -->
+    <!-- ========================= -->
+
+    <div class="app-content">
+
+
+        <!-- ========================= -->
+        <!-- CHAT SIDEBAR -->
+        <!-- ========================= -->
+
+        <aside
+            class="sidebar"
+            id="sidebar"
+        >
+
+            <div class="sidebar-header">
+
+                <span>
+                    Your Chats
+                </span>
+
+                <button
+                    id="closeSidebar"
+                    class="close-sidebar"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div
+                class="chat-list"
+                id="chatList"
+            >
+
+                <div class="empty-chats">
+
+                    Hozircha chatlar yo'q
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ========================= -->
+        <!-- MAIN CHAT -->
+        <!-- ========================= -->
+
+        <main
+            class="chat"
+            id="chat"
+        >
+
+            <div class="welcome">
+
+                <div class="welcome-logo">
+                    M3
+                </div>
+
+                <h1>
+
+                    Salom, men
+
+                    <span>M3NOVA</span>
+
+                </h1>
+
+                <p>
+
+                    Sizning premium sunʼiy intellekt yordamchingiz.
+
+                </p>
+
+                <div class="welcome-line"></div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- INPUT -->
+    <!-- ========================= -->
+
+    <div class="input-area">
+
+        <div class="input-box">
+
+            <textarea
+                id="message"
+                placeholder="M3NOVA bilan suhbatni boshlang..."
+                rows="1"
+            ></textarea>
+
+
+            <button
+                id="sendButton"
+                class="send-button"
+                aria-label="Send"
+            >
+
+                <svg
+                    viewBox="0 0 24 24"
+                    width="22"
+                    height="22"
+                    fill="none"
+                >
+
+                    <path
+                        d="M22 2L11 13"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+
+                    <path
+                        d="M22 2L15 22L11 13L2 9L22 2Z"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+
+                </svg>
+
+            </button>
+
+        </div>
+
+
+        <div class="footer-text">
+
+            M3NOVA can make mistakes.
+            Check important information.
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- JAVASCRIPT -->
+
+<script src="/static/script.js"></script>
+
+</body>
+
+</html>
