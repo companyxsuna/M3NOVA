@@ -42,21 +42,10 @@ const chatList = document.getElementById("chatList");
 // TOKENS & STATE
 // ========================================
 
-let userToken = localStorage.getItem(
-    "m3nova_user_token"
-);
-
-let ownerToken = localStorage.getItem(
-    "m3nova_owner_token"
-);
-
-let username = localStorage.getItem(
-    "m3nova_username"
-);
-
-let currentChatId = localStorage.getItem(
-    "m3nova_current_chat_id"
-);
+let userToken = localStorage.getItem("m3nova_user_token");
+let ownerToken = localStorage.getItem("m3nova_owner_token");
+let username = localStorage.getItem("m3nova_username");
+let currentChatId = localStorage.getItem("m3nova_current_chat_id");
 
 
 // ========================================
@@ -66,25 +55,18 @@ let currentChatId = localStorage.getItem(
 function openApp() {
 
     authScreen.classList.add("hidden");
-
     app.classList.remove("hidden");
 
-    userInfo.textContent =
-        username || "User";
-
+    userInfo.textContent = username || "User";
 }
 
 
 function openAuth() {
 
     app.classList.add("hidden");
-
     authScreen.classList.remove("hidden");
 
 }
-
-
-
 
 
 // ========================================
@@ -93,7 +75,7 @@ function openAuth() {
 
 function showAuthMessage(text) {
 
-    authMessage.textContent = text;
+    authMessage.textContent = text || "";
 
 }
 
@@ -102,32 +84,22 @@ function showAuthMessage(text) {
 // SWITCH LOGIN / SIGNUP
 // ========================================
 
-showSignup.addEventListener(
-    "click",
-    function () {
+showSignup.addEventListener("click", function () {
 
-        loginForm.classList.add("hidden");
+    loginForm.classList.add("hidden");
+    signupForm.classList.remove("hidden");
+    authMessage.textContent = "";
 
-        signupForm.classList.remove("hidden");
-
-        authMessage.textContent = "";
-
-    }
-);
+});
 
 
-showLogin.addEventListener(
-    "click",
-    function () {
+showLogin.addEventListener("click", function () {
 
-        signupForm.classList.add("hidden");
+    signupForm.classList.add("hidden");
+    loginForm.classList.remove("hidden");
+    authMessage.textContent = "";
 
-        loginForm.classList.remove("hidden");
-
-        authMessage.textContent = "";
-
-    }
-);
+});
 
 
 // ========================================
@@ -136,101 +108,62 @@ showLogin.addEventListener(
 
 async function signup() {
 
-    const newUsername =
-        signupUsername.value.trim();
+    const newUsername = signupUsername.value.trim();
+    const newPassword = signupPassword.value.trim();
 
-    const newPassword =
-        signupPassword.value.trim();
+    if (newUsername === "" || newPassword === "") {
 
-
-    if (
-        newUsername === "" ||
-        newPassword === ""
-    ) {
-
-        showAuthMessage(
-            "Barcha maydonlarni to‘ldiring."
-        );
-
+        showAuthMessage("Barcha maydonlarni to‘ldiring.");
         return;
 
     }
 
-
     signupButton.disabled = true;
-
-    signupButton.textContent =
-        "Creating...";
-
+    signupButton.textContent = "Creating...";
 
     try {
 
-        const response = await fetch(
-            "/signup",
-            {
+        const response = await fetch("/signup", {
 
-                method: "POST",
+            method: "POST",
 
-                headers: {
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-                    "Content-Type":
-                        "application/json"
+            body: JSON.stringify({
+                username: newUsername,
+                password: newPassword
+            })
 
-                },
-
-                body: JSON.stringify({
-
-                    username:
-                        newUsername,
-
-                    password:
-                        newPassword
-
-                })
-}
-        );
+        });
 
 
-        const data =
-            await response.json();
+        const data = await response.json();
 
-
-        showAuthMessage(
-            data.message
-        );
+        showAuthMessage(data.message);
 
 
         if (data.success) {
 
-            userToken =
-                data.user_token;
-
-            username =
-                data.username;
-
+            userToken = data.user_token;
+            username = data.username;
 
             localStorage.setItem(
                 "m3nova_user_token",
                 userToken
             );
 
-
             localStorage.setItem(
                 "m3nova_username",
                 username
             );
 
+            setTimeout(function () {
+openApp();
+                loadChats();
 
-            setTimeout(
-                function () {
-
-                    openApp();
-
-                    loadChats();
-
-                },
-                500
-            );
+            }, 500);
 
         }
 
@@ -245,11 +178,8 @@ async function signup() {
 
     } finally {
 
-        signupButton.disabled =
-            false;
-
-        signupButton.textContent =
-            "Create Account";
+        signupButton.disabled = false;
+        signupButton.textContent = "Create Account";
 
     }
 
@@ -262,17 +192,10 @@ async function signup() {
 
 async function login() {
 
-    const loginUser =
-        loginUsername.value.trim();
+    const loginUser = loginUsername.value.trim();
+    const loginPass = loginPassword.value.trim();
 
-    const loginPass =
-        loginPassword.value.trim();
-
-
-    if (
-        loginUser === "" ||
-        loginPass === ""
-    ) {
+    if (loginUser === "" || loginPass === "") {
 
         showAuthMessage(
             "Username va parolni kiriting."
@@ -282,65 +205,44 @@ async function login() {
 
     }
 
-
     loginButton.disabled = true;
-
-    loginButton.textContent =
-        "Signing in...";
+    loginButton.textContent = "Signing in...";
 
 
     try {
 
-        const response = await fetch(
-            "/login",
-            {
+        const response = await fetch("/login", {
 
-                method: "POST",
+            method: "POST",
 
-                headers: {
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-                    "Content-Type":
-                        "application/json"
+            body: JSON.stringify({
 
-                },
+                username: loginUser,
+                password: loginPass
 
-                body: JSON.stringify({
+            })
 
-                    username:
-                        loginUser,
-
-                    password:
-                        loginPass
-
-                })
-
-            }
-        );
+        });
 
 
-        const data =
-            await response.json();
+        const data = await response.json();
 
-
-        showAuthMessage(
-            data.message
-        );
+        showAuthMessage(data.message);
 
 
         if (data.success) {
 
-            userToken =
-                data.user_token;
-
-            username =
-                data.username;
-
+            userToken = data.user_token;
+            username = data.username;
 
             localStorage.setItem(
                 "m3nova_user_token",
                 userToken
             );
-
 
             localStorage.setItem(
                 "m3nova_username",
@@ -348,16 +250,13 @@ async function login() {
             );
 
 
-            setTimeout(
-                function () {
+            setTimeout(function () {
 
-                    openApp();
+                openApp();
+                loadChats();
+                loadCurrentChat();
 
-                    loadChats();
-
-                },
-                500
-            );
+            }, 300);
 
         }
 
@@ -372,11 +271,8 @@ async function login() {
 
     } finally {
 
-        loginButton.disabled =
-            false;
-
-        loginButton.textContent =
-            "Sign In";
+        loginButton.disabled = false;
+        loginButton.textContent = "Sign In";
 
     }
 
@@ -387,65 +283,48 @@ async function login() {
 // AUTH BUTTONS
 // ========================================
 
-loginButton.addEventListener(
-    "click",
-    login
-);
-
-
-signupButton.addEventListener(
-    "click",
-    signup
-);
+loginButton.addEventListener("click", login);
+signupButton.addEventListener("click", signup);
 
 
 // ========================================
 // ENTER LOGIN
 // ========================================
 
-loginPassword.addEventListener(
-    "keydown",
-    function (event) {
+loginPassword.addEventListener("keydown", function (event) {
 
-        if (
-            event.key === "Enter"
-        ) {
+    if (event.key === "Enter") {
 
-            event.preventDefault();
-
-            login();
-
-        }
+        event.preventDefault();
+        login();
 
     }
-);
+
+});
 
 
-signupPassword.addEventListener(
-    "keydown",
-    function (event) {
+signupPassword.addEventListener("keydown", function (event) {
 
-        if (
-            event.key === "Enter"
-        ) {
+    if (event.key === "Enter") {
 
-            event.preventDefault();
-
-            signup();
-
-        }
+        event.preventDefault();
+        signup();
 
     }
-);
+
+});
+
 
 // ========================================
 // CLEAR CHAT SCREEN
 // ========================================
 
 function clearChat() {
+
     chat.innerHTML = "";
 
     const welcome = document.createElement("div");
+
     welcome.className = "welcome";
 
     welcome.innerHTML =
@@ -455,7 +334,9 @@ function clearChat() {
         '<div class="welcome-line"></div>';
 
     chat.appendChild(welcome);
+
 }
+
 
 // ========================================
 // ADD MESSAGE
@@ -463,8 +344,7 @@ function clearChat() {
 
 function addMessage(text, type) {
 
-    const message =
-        document.createElement("div");
+    const message = document.createElement("div");
 
     message.className =
         "message " +
@@ -472,57 +352,37 @@ function addMessage(text, type) {
         " message-enter";
 
 
-    const name =
-        document.createElement("div");
+    const name = document.createElement("div");
 
-    name.className =
-        "name";
-
+    name.className = "name";
 
     name.textContent =
         type === "user"
-            ? username || "Siz"
+            ? (username || "Siz")
             : "M3NOVA";
 
 
-    const content =
-        document.createElement("div");
+    const content = document.createElement("div");
 
-    content.className =
-        "message-text";
+    content.className = "message-text";
 
-    content.textContent =
-        text;
+    content.textContent = text || "";
 
 
-    message.appendChild(
-        name
-    );
+    message.appendChild(name);
+    message.appendChild(content);
 
-    message.appendChild(
-        content
-    );
+    chat.appendChild(message);
 
 
-    chat.appendChild(
-        message
-    );
+    requestAnimationFrame(function () {
+
+        message.classList.add("show");
+
+    });
 
 
-    requestAnimationFrame(
-        function () {
-
-            message.classList.add(
-                "show"
-            );
-
-        }
-    );
-
-
-    chat.scrollTop =
-        chat.scrollHeight;
-
+    chat.scrollTop = chat.scrollHeight;
 
     return content;
 
@@ -534,52 +394,32 @@ function addMessage(text, type) {
 // ========================================
 
 function showTyping() {
-
-    const message =
-        document.createElement("div");
+const message = document.createElement("div");
 
     message.className =
         "message ai typing-message";
 
 
-    const name =
-        document.createElement("div");
+    const name = document.createElement("div");
 
-    name.className =
-        "name";
-
-    name.textContent =
-        "M3NOVA";
+    name.className = "name";
+    name.textContent = "M3NOVA";
 
 
-    const typing =
-        document.createElement("div");
+    const typing = document.createElement("div");
 
-    typing.className =
-        "typing";
-
+    typing.className = "typing";
 
     typing.innerHTML =
         "<span></span><span></span><span></span>";
 
 
-    message.appendChild(
-        name
-    );
+    message.appendChild(name);
+    message.appendChild(typing);
 
-    message.appendChild(
-        typing
-    );
+    chat.appendChild(message);
 
-
-    chat.appendChild(
-        message
-    );
-
-
-    chat.scrollTop =
-        chat.scrollHeight;
-
+    chat.scrollTop = chat.scrollHeight;
 
     return message;
 
@@ -595,7 +435,6 @@ async function createNewChat() {
     if (!userToken) {
 
         openAuth();
-
         return;
 
     }
@@ -605,19 +444,14 @@ async function createNewChat() {
 
         const response = await fetch(
             "/new-chat?user_token=" +
-            encodeURIComponent(
-                userToken
-            ),
+            encodeURIComponent(userToken),
             {
-
                 method: "POST"
-
             }
         );
 
 
-        const data =
-            await response.json();
+        const data = await response.json();
 
 
         if (!data.success) {
@@ -632,8 +466,7 @@ async function createNewChat() {
         }
 
 
-        currentChatId =
-            data.chat_id;
+        currentChatId = data.chat_id;
 
 
         localStorage.setItem(
@@ -644,14 +477,9 @@ async function createNewChat() {
 
         clearChat();
 
-
-        sidebar.classList.remove(
-            "show"
-        );
-
+        sidebar.classList.remove("show");
 
         input.focus();
-
 
         await loadChats();
 
@@ -682,6 +510,7 @@ async function loadChats() {
         return;
     }
 
+
     try {
 
         const response = await fetch(
@@ -689,43 +518,47 @@ async function loadChats() {
             encodeURIComponent(userToken)
         );
 
+
         const data = await response.json();
+
 
         if (!data.success) {
             return;
         }
 
+
         chatList.innerHTML = "";
+
 
         if (
             !data.chats ||
             data.chats.length === 0
         ) {
 
-            chatList.innerHTML = 
-                <div class="empty-chats">
-                    Hozircha chatlar yo'q
-                </div>
-            ;
+            chatList.innerHTML =
+                '<div class="empty-chats">' +
+                'Hozircha chatlar yo‘q' +
+                '</div>';
 
             return;
+
         }
+
 
         data.chats.forEach(function (item) {
 
             const button =
                 document.createElement("button");
 
-            button.className =
-                "chat-item";
+            button.className = "chat-item";
 
-            if (
-                item.chat_id === currentChatId
-            ) {
+
+            if (item.chat_id === currentChatId) {
 
                 button.classList.add("active");
 
             }
+
 
             const title =
                 document.createElement("div");
@@ -764,7 +597,6 @@ async function loadChats() {
 
 
             button.appendChild(title);
-
             button.appendChild(date);
 
 
@@ -772,9 +604,7 @@ async function loadChats() {
                 "click",
                 function () {
 
-                    openChat(
-                        item.chat_id
-                    );
+                    openChat(item.chat_id);
 
                 }
             );
@@ -783,6 +613,7 @@ async function loadChats() {
             chatList.appendChild(button);
 
         });
+
 
     } catch (error) {
 
@@ -795,6 +626,7 @@ async function loadChats() {
 
 }
 
+
 // ========================================
 // OPEN OLD CHAT
 // ========================================
@@ -802,39 +634,28 @@ async function loadChats() {
 async function openChat(chatId) {
 
     if (!userToken) {
-
         return;
-
     }
 
 
     try {
-
-        const response = await fetch(
+const response = await fetch(
             "/history?user_token=" +
-            encodeURIComponent(
-                userToken
-            ) +
+            encodeURIComponent(userToken) +
             "&chat_id=" +
-            encodeURIComponent(
-                chatId
-            )
+            encodeURIComponent(chatId)
         );
 
 
-        const data =
-            await response.json();
+        const data = await response.json();
 
 
         if (!data.success) {
-
             return;
-
         }
 
 
-        currentChatId =
-            chatId;
+        currentChatId = chatId;
 
 
         localStorage.setItem(
@@ -843,8 +664,7 @@ async function openChat(chatId) {
         );
 
 
-        chat.innerHTML =
-            "";
+        chat.innerHTML = "";
 
 
         if (
@@ -864,7 +684,6 @@ async function openChat(chatId) {
                             ? "user"
                             : "ai";
 
-
                     addMessage(
                         item.content,
                         type
@@ -876,13 +695,9 @@ async function openChat(chatId) {
         }
 
 
-        sidebar.classList.remove(
-            "show"
-        );
-
+        sidebar.classList.remove("show");
 
         await loadChats();
-
 
         input.focus();
 
@@ -907,15 +722,11 @@ historyButton.addEventListener(
     "click",
     async function () {
 
-        sidebar.classList.toggle(
-            "show"
-        );
+        sidebar.classList.toggle("show");
 
 
         if (
-            sidebar.classList.contains(
-                "show"
-            )
+            sidebar.classList.contains("show")
         ) {
 
             await loadChats();
@@ -924,13 +735,13 @@ historyButton.addEventListener(
 
     }
 );
+
+
 closeSidebar.addEventListener(
     "click",
     function () {
 
-        sidebar.classList.remove(
-            "show"
-        );
+        sidebar.classList.remove("show");
 
     }
 );
@@ -942,21 +753,17 @@ closeSidebar.addEventListener(
 
 async function sendMessage() {
 
-    const message =
-        input.value.trim();
+    const message = input.value.trim();
 
 
     if (message === "") {
-
         return;
-
     }
 
 
     if (!userToken) {
 
         openAuth();
-
         return;
 
     }
@@ -968,16 +775,13 @@ async function sendMessage() {
 
         try {
 
-            const response =
-                await fetch(
-                    "/new-chat?user_token=" +
-                    encodeURIComponent(
-                        userToken
-                    ),
-                    {
-                        method: "POST"
-                    }
-                );
+            const response = await fetch(
+                "/new-chat?user_token=" +
+                encodeURIComponent(userToken),
+                {
+                    method: "POST"
+                }
+            );
 
 
             const data =
@@ -1012,35 +816,23 @@ async function sendMessage() {
     }
 
 
-    // REMOVE WELCOME SCREEN
-
     const welcome =
-        chat.querySelector(
-            ".welcome"
-        );
+        chat.querySelector(".welcome");
 
 
     if (welcome) {
-
         welcome.remove();
-
     }
 
 
-    addMessage(
-        message,
-        "user"
-    );
+    addMessage(message, "user");
 
 
     input.value = "";
 
-    input.style.height =
-        "auto";
+    input.style.height = "auto";
 
-
-    sendButton.disabled =
-        true;
+    sendButton.disabled = true;
 
 
     const typingMessage =
@@ -1050,39 +842,33 @@ async function sendMessage() {
     try {
 
         const response =
-            await fetch(
-                "/chat",
-                {
+            await fetch("/chat", {
 
-                    method:
-                        "POST",
+                method: "POST",
 
-                    headers: {
+                headers: {
 
-                        "Content-Type":
-                            "application/json"
+                    "Content-Type":
+                        "application/json"
 
-                    },
+                },
 
-                    body:
-                        JSON.stringify({
+                body: JSON.stringify({
 
-                            message:
-                                message,
+                    message: message,
 
-                            user_token:
-                                userToken,
+                    user_token:
+                        userToken,
 
-                            owner_token:
-                                ownerToken,
+                    owner_token:
+                        ownerToken,
 
-                            chat_id:
-                                currentChatId
+                    chat_id:
+                        currentChatId
 
-                        })
+                })
 
-                }
-            );
+            });
 
 
         const data =
@@ -1092,9 +878,7 @@ async function sendMessage() {
         typingMessage.remove();
 
 
-        if (
-            data.login_required
-        ) {
+        if (data.login_required) {
 
             clearLocalSession();
 
@@ -1107,15 +891,11 @@ async function sendMessage() {
 
         // OWNER AUTH
 
-        if (
-            data.owner_token
-        ) {
+        if (data.owner_token) {
 
             ownerToken =
                 data.owner_token;
-
-
-            localStorage.setItem(
+localStorage.setItem(
                 "m3nova_owner_token",
                 ownerToken
             );
@@ -1125,9 +905,7 @@ async function sendMessage() {
 
         // UPDATE CHAT ID
 
-        if (
-            data.chat_id
-        ) {
+        if (data.chat_id) {
 
             currentChatId =
                 data.chat_id;
@@ -1142,16 +920,11 @@ async function sendMessage() {
 
 
         addMessage(
-
             data.reply ||
             "M3NOVA javob bermadi.",
-
             "ai"
-
         );
 
-
-        // REFRESH CHAT LIST
 
         loadChats();
 
@@ -1168,21 +941,18 @@ async function sendMessage() {
 
 
         addMessage(
-
             "Server bilan bog‘lanib bo‘lmadi.",
-
             "ai"
-
         );
 
 
     } finally {
 
-        sendButton.disabled =
-            false;
+        sendButton.disabled = false;
 
         input.focus();
-        }
+
+    }
 
 }
 
@@ -1218,13 +988,9 @@ async function logout() {
 
         await fetch(
             "/logout?user_token=" +
-            encodeURIComponent(
-                userToken
-            ),
+            encodeURIComponent(userToken),
             {
-
                 method: "POST"
-
             }
         );
 
@@ -1242,9 +1008,7 @@ async function logout() {
 
     clearChat();
 
-    sidebar.classList.remove(
-        "show"
-    );
+    sidebar.classList.remove("show");
 
     openAuth();
 
@@ -1275,11 +1039,8 @@ function clearLocalSession() {
 
 
     userToken = null;
-
     ownerToken = null;
-
     username = null;
-
     currentChatId = null;
 
 }
@@ -1326,9 +1087,7 @@ input.addEventListener(
     "input",
     function () {
 
-        this.style.height =
-            "auto";
-
+        this.style.height = "auto";
 
         this.style.height =
             Math.min(
@@ -1363,13 +1122,9 @@ async function loadCurrentChat() {
         const response =
             await fetch(
                 "/history?user_token=" +
-                encodeURIComponent(
-                    userToken
-                ) +
+                encodeURIComponent(userToken) +
                 "&chat_id=" +
-                encodeURIComponent(
-                    currentChatId
-                )
+                encodeURIComponent(currentChatId)
             );
 
 
@@ -1383,8 +1138,7 @@ async function loadCurrentChat() {
             data.messages.length > 0
         ) {
 
-            chat.innerHTML =
-                "";
+            chat.innerHTML = "";
 
 
             data.messages.forEach(
@@ -1392,9 +1146,8 @@ async function loadCurrentChat() {
 
                     const type =
                         item.role === "user"
-                            ? "user"
+                        ? "user"
                             : "ai";
-
 
                     addMessage(
                         item.content,
@@ -1409,6 +1162,7 @@ async function loadCurrentChat() {
             clearChat();
 
         }
+
 
     } catch (error) {
 
@@ -1437,9 +1191,7 @@ async function initializeApp() {
 
         openApp();
 
-
         await loadChats();
-
 
         await loadCurrentChat();
 
