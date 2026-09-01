@@ -5,6 +5,7 @@
 const chat = document.getElementById("chat");
 const input = document.getElementById("message");
 const sendButton = document.getElementById("sendButton");
+const micButton = document.getElementById("micButton");
 
 // AUTH
 const authScreen = document.getElementById("authScreen");
@@ -383,6 +384,12 @@ function addMessage(text, type) {
 
 
     chat.scrollTop = chat.scrollHeight;
+
+    if (type === "ai") {
+
+    speakM3NOVA(text);
+
+}
 
     return content;
 
@@ -1218,3 +1225,138 @@ async function initializeApp() {
 // ========================================
 
 initializeApp();
+
+// ========================================
+// VOICE RECOGNITION
+// ========================================
+
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+
+if (SpeechRecognition) {
+
+    const recognition =
+        new SpeechRecognition();
+
+    recognition.lang = "uz-UZ";
+
+    recognition.continuous = false;
+
+    recognition.interimResults = false;
+
+
+    micButton.addEventListener(
+        "click",
+        function () {
+
+            recognition.start();
+
+        }
+    );
+
+
+    recognition.onstart =
+        function () {
+
+            micButton.classList.add(
+                "listening"
+            );
+
+        };
+
+
+    recognition.onend =
+        function () {
+
+            micButton.classList.remove(
+                "listening"
+            );
+
+        };
+
+
+    recognition.onresult =
+        function (event) {
+
+            const voiceText =
+                event.results[0][0].transcript;
+
+
+            input.value =
+                voiceText;
+
+
+            // AUTOMATIC SEND
+
+            sendMessage();
+
+        };
+
+
+    recognition.onerror =
+        function (event) {
+
+            console.error(
+                "VOICE ERROR:",
+                event.error
+            );
+
+            micButton.classList.remove(
+                "listening"
+            );
+
+        };
+
+} else {
+
+    console.log(
+        "Speech Recognition qo'llab-quvvatlanmaydi."
+    );
+
+}
+
+// ========================================
+// M3NOVA VOICE
+// ========================================
+
+function speakM3NOVA(text) {
+
+    if (!("speechSynthesis" in window)) {
+        return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const speech =
+        new SpeechSynthesisUtterance(text);
+
+    speech.lang = "uz-UZ";
+    speech.rate = 1;
+    speech.pitch = 1.15;
+
+    const voices =
+        window.speechSynthesis.getVoices();
+
+    const femaleVoice =
+        voices.find(
+            voice =>
+                voice.name.toLowerCase().includes("female") ||
+                voice.name.toLowerCase().includes("zira") ||
+                voice.name.toLowerCase().includes("samantha") ||
+                voice.name.toLowerCase().includes("google uk english female")
+        );
+
+    if (femaleVoice) {
+        speech.voice = femaleVoice;
+    }
+
+    window.speechSynthesis.speak(speech);
+}
+
+
+window.speechSynthesis.onvoiceschanged =
+    function () {
+        window.speechSynthesis.getVoices();
+    };

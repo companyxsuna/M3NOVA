@@ -1904,3 +1904,99 @@ font-size: 13px;
     }
 
 }
+/* =========================================
+   VOICE / MICROPHONE
+========================================= */
+
+.mic-button {
+    width: 43px;
+    height: 43px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    border-radius: 14px;
+
+    background:
+        rgba(255, 255, 255, 0.05);
+
+    color: white;
+
+    font-size: 19px;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.mic-button:hover {
+    transform: translateY(-2px);
+
+    background:
+        rgba(124, 92, 255, 0.18);
+
+    box-shadow:
+        0 0 20px rgba(124, 92, 255, 0.25);
+}
+
+.mic-button:active {
+    transform: scale(0.93);
+}
+
+
+/* MICROPHONE LISTENING */
+
+.mic-button.listening {
+    background:
+        linear-gradient(
+            135deg,
+            #ff4d7a,
+            #ff7a59
+        );
+
+    animation:
+        micPulse 1s infinite;
+
+    box-shadow:
+        0 0 25px rgba(255, 77, 122, 0.55);
+}
+
+@keyframes micPulse {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.12);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    .mic-button {
+        width: 42px;
+        height: 42px;
+
+        font-size: 18px;
+
+        border-radius: 13px;
+    }
+
+}
