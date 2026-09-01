@@ -1748,3 +1748,159 @@ font-size: 13px;
     }
 
 }
+/* =========================================
+   BETTER MOBILE DESIGN
+========================================= */
+
+@media (max-width: 600px) {
+
+    /* HEADER */
+
+    .header {
+        height: auto;
+        min-height: 70px;
+
+        padding: 10px 12px;
+
+        gap: 10px;
+    }
+
+
+    /* BRAND */
+
+    .brand {
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .logo {
+        width: 42px;
+        height: 42px;
+
+        flex-shrink: 0;
+    }
+
+    .brand-name {
+        font-size: 15px;
+
+        letter-spacing: 2px;
+
+        white-space: nowrap;
+    }
+
+    .brand-status {
+        font-size: 8px;
+
+        letter-spacing: 1px;
+    }
+
+
+    /* HEADER BUTTONS */
+
+    .header-right {
+        gap: 5px;
+
+        flex-shrink: 0;
+    }
+
+    .header-button,
+    .logout-button {
+        padding: 8px 9px;
+
+        font-size: 10px;
+
+        border-radius: 10px;
+
+        white-space: nowrap;
+    }
+
+
+    /* CHAT */
+
+    .chat {
+        padding:
+            20px 14px 145px;
+    }
+
+
+    /* WELCOME */
+
+    .welcome {
+        min-height: 65vh;
+
+        padding: 0 5px;
+    }
+
+    .welcome-logo {
+        width: 72px;
+        height: 72px;
+
+        font-size: 24px;
+
+        border-radius: 22px;
+    }
+
+    .welcome h1 {
+        font-size: 28px;
+
+        line-height: 1.2;
+    }
+
+    .welcome p {
+        font-size: 13px;
+
+        line-height: 1.5;
+
+        max-width: 300px;
+    }
+
+
+    /* MESSAGES */
+
+    .message {
+        max-width: 92%;
+
+        font-size: 14px;
+
+        margin-bottom: 18px;
+    }
+
+
+    /* INPUT */
+
+    .input-area {
+        padding:
+            10px 10px
+            calc(12px + env(safe-area-inset-bottom));
+    }
+
+    .input-box {
+        border-radius: 18px;
+
+        padding:
+            9px 9px 9px 14px;
+    }
+
+    textarea {
+        font-size: 16px;
+    }
+
+    .send-button {
+        width: 44px;
+        height: 44px;
+
+        border-radius: 14px;
+    }
+
+
+    /* SIDEBAR */
+
+    .sidebar {
+        top: 70px;
+
+        width: 88%;
+
+        max-width: 330px;
+    }
+
+}
