@@ -1,4 +1,13 @@
 // ========================================
+// ADMIN PANEL
+// ========================================
+
+let adminToken = localStorage.getItem("m3nova_admin_token");
+
+const adminPanel = document.getElementById("adminPanel");
+const closeAdminPanel = document.getElementById("closeAdminPanel");
+
+// ========================================
 // ELEMENTS
 // ========================================
 
@@ -459,6 +468,28 @@ async function createNewChat() {
 
 
         const data = await response.json();
+
+        // ========================================
+// ADMIN AUTHENTICATION
+// ========================================
+
+if (data.admin_authenticated) {
+
+    adminToken = data.admin_token;
+
+    localStorage.setItem(
+        "m3nova_admin_token",
+        adminToken
+    );
+
+    if (adminPanel) {
+        adminPanel.classList.remove("hidden");
+    }
+
+    loadAdminStats();
+
+    return;
+}
 
 
         if (!data.success) {
@@ -1360,3 +1391,134 @@ window.speechSynthesis.onvoiceschanged =
     function () {
         window.speechSynthesis.getVoices();
     };
+
+    // ========================================
+// LOAD ADMIN STATS
+// ========================================
+
+async function loadAdminStats() {
+
+    if (!adminToken) {
+        return;
+    }
+
+    try {
+
+       const response = await fetch(
+    "/admin/stats?admin_token=" + adminToken
+);
+
+        const data = await response.json();
+
+        if (data.error) {
+            console.error("ADMIN ERROR:", data.error);
+            return;
+        }
+
+
+        // TOTAL VISITORS
+
+        const totalVisitors =
+            document.getElementById("totalVisitors");
+
+        if (totalVisitors) {
+            totalVisitors.textContent =
+                data.total_visitors ?? 0;
+        }
+
+
+        // ONLINE USERS
+
+        const onlineNow =
+            document.getElementById("onlineNow");
+
+        if (onlineNow) {
+            onlineNow.textContent =
+                data.online_now ?? 0;
+        }
+
+
+        // REGISTERED USERS
+
+        const totalUsers =
+            document.getElementById("totalUsers");
+
+        if (totalUsers) {
+            totalUsers.textContent =
+                data.total_users ?? 0;
+        }
+
+
+        // COUNTRIES
+
+        const countriesList =
+            document.getElementById("countriesList");
+
+        if (countriesList) {
+
+            if (!data.countries?.length) {
+
+                countriesList.textContent =
+                    "Hozircha ma'lumot yo'q.";
+
+            } else {
+
+                countriesList.innerHTML =
+                    data.countries
+                        .map(item =>
+                            <div>${item.country} — ${item.count}</div>
+                        )
+                        .join("");
+
+            }
+        }
+
+
+        // DEVICES
+
+        const devicesList =
+            document.getElementById("devicesList");
+
+        if (devicesList) {
+
+            if (!data.devices?.length) {
+
+                devicesList.textContent =
+                    "Hozircha ma'lumot yo'q.";
+
+            } else {
+
+                devicesList.innerHTML =
+                    data.devices
+                        .map(item =>
+                            <div>${item.device} — ${item.count}</div>
+                        )
+                        .join("");
+
+            }
+        }
+
+    } catch (error) {
+
+        console.error(
+            "ADMIN STATS ERROR:",
+            error
+        );
+
+    }
+}
+
+if (closeAdminPanel) {
+
+    closeAdminPanel.addEventListener(
+        "click",
+        () => {
+
+            adminPanel.classList.add(
+                "hidden"
+            );
+
+        }
+    );
+
+}

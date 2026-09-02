@@ -24,6 +24,7 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 OWNER_CODE = os.getenv("OWNER_CODE")
+ADMIN_CODE = os.getenv("ADMIN_CODE")
 
 if not GEMINI_API_KEY:
     raise RuntimeError("GEMINI_API_KEY topilmadi.")
@@ -137,6 +138,18 @@ def init_database():
 
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS visitors (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            visitor_id TEXT UNIQUE NOT NULL,
+            country TEXT,
+            device TEXT,
+            user_agent TEXT,
+            first_seen TEXT NOT NULL,
+            last_seen TEXT NOT NULL
+        )
+    """)
+
 
     connection.commit()
 
@@ -222,6 +235,8 @@ class LoginRequest(BaseModel):
 
     password: str
 
+    
+
 
 # ==================================================
 # SESSIONS
@@ -229,6 +244,61 @@ class LoginRequest(BaseModel):
 
 user_sessions = {}
 owner_sessions = set()
+admin_sessions = set()
+online_visitors = {}
+
+def register_visitor(visitor_id, country, device, user_agent):
+    connection = get_db()
+    cursor = connection.cursor()
+
+    now = datetime.utcnow().isoformat()
+
+    cursor.execute("""
+        SELECT id FROM visitors
+        WHERE visitor_id = ?
+    """, (visitor_id,))
+
+    existing = cursor.fetchone()
+
+    if existing:
+        cursor.execute("""
+            UPDATE visitors
+            SET country = ?,
+                device = ?,
+                user_agent = ?,
+                last_seen = ?
+            WHERE visitor_id = ?
+        """, (
+            country,
+            device,
+            user_agent,
+            now,
+            visitor_id
+        ))
+    else:
+        cursor.execute("""
+            INSERT INTO visitors (
+                visitor_id,
+                country,
+                device,
+                user_agent,
+                first_seen,
+                last_seen
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            visitor_id,
+            country,
+            device,
+            user_agent,
+            now,
+            now
+        ))
+
+    connection.commit()
+    connection.close()
+
+    online_visitors[visitor_id] = now
 
 
 # ==================================================
@@ -984,6 +1054,75 @@ def get_history(
 # CHAT
 # ==================================================
 
+@app.get("/admin/stats")
+def admin_stats(admin_token: str | None = None):
+
+    if not admin_token or admin_token not in admin_sessions:
+        return {
+            "error": "Admin ruxsati yo'q."
+        }
+
+    connection = get_db()
+    cursor = connection.cursor()
+
+    # Jami tashrifchilar
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM visitors
+    """)
+    total_visitors = cursor.fetchone()["total"]
+
+    # Jami ro'yxatdan o'tgan userlar
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM users
+    """)
+    total_users = cursor.fetchone()["total"]
+
+    # Davlatlar
+    cursor.execute("""
+        SELECT country, COUNT(*) AS count
+        FROM visitors
+        WHERE country IS NOT NULL
+        AND country != ''
+        GROUP BY country
+        ORDER BY count DESC
+    """)
+    countries = [
+        {
+            "country": row["country"],
+            "count": row["count"]
+        }
+        for row in cursor.fetchall()
+    ]
+
+    # Qurilmalar
+    cursor.execute("""
+        SELECT device, COUNT(*) AS count
+        FROM visitors
+        WHERE device IS NOT NULL
+        AND device != ''
+        GROUP BY device
+        ORDER BY count DESC
+    """)
+    devices = [
+        {
+            "device": row["device"],
+            "count": row["count"]
+        }
+        for row in cursor.fetchall()
+    ]
+
+    connection.close()
+
+    return {
+        "total_visitors": total_visitors,
+        "online_now": len(online_visitors),
+        "total_users": total_users,
+        "countries": countries,
+        "devices": devices
+    }
+
 @app.post("/chat")
 def chat(request: ChatRequest):
 
@@ -1048,6 +1187,38 @@ def chat(request: ChatRequest):
     if not chat_id:
 
         chat_id = create_chat_id()
+
+        # ==================================================
+    # ADMIN CODE
+    # ==================================================
+
+    if secrets.compare_digest(
+        message,
+        ADMIN_CODE
+    ):
+
+        admin_token = secrets.token_urlsafe(
+            32
+        )
+
+        admin_sessions.add(
+            admin_token
+        )
+
+        return {
+
+            "reply":
+            "🛡️ Admin panel tasdiqlandi.",
+
+            "admin_authenticated":
+            True,
+
+            "admin_token":
+            admin_token,
+
+            "chat_id":
+            chat_id
+        }
 
 
     # ==================================================
