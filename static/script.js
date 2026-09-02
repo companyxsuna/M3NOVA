@@ -1,11 +1,7 @@
 // ========================================
-// ADMIN PANEL
+// M3NOVA AI - SCRIPT.JS
 // ========================================
 
-let adminToken = localStorage.getItem("m3nova_admin_token");
-
-const adminPanel = document.getElementById("adminPanel");
-const closeAdminPanel = document.getElementById("closeAdminPanel");
 
 // ========================================
 // ELEMENTS
@@ -38,7 +34,7 @@ const signupButton = document.getElementById("signupButton");
 const authMessage = document.getElementById("authMessage");
 const userInfo = document.getElementById("userInfo");
 
-// CHAT MANAGEMENT
+// CHAT
 const newChatButton = document.getElementById("newChatButton");
 const historyButton = document.getElementById("historyButton");
 const logoutButton = document.getElementById("logoutButton");
@@ -47,15 +43,29 @@ const sidebar = document.getElementById("sidebar");
 const closeSidebar = document.getElementById("closeSidebar");
 const chatList = document.getElementById("chatList");
 
+// ADMIN
+const adminPanel = document.getElementById("adminPanel");
+const closeAdminPanel = document.getElementById("closeAdminPanel");
+
 
 // ========================================
 // TOKENS & STATE
 // ========================================
 
-let userToken = localStorage.getItem("m3nova_user_token");
-let ownerToken = localStorage.getItem("m3nova_owner_token");
-let username = localStorage.getItem("m3nova_username");
-let currentChatId = localStorage.getItem("m3nova_current_chat_id");
+let userToken =
+    localStorage.getItem("m3nova_user_token");
+
+let ownerToken =
+    localStorage.getItem("m3nova_owner_token");
+
+let adminToken =
+    localStorage.getItem("m3nova_admin_token");
+
+let username =
+    localStorage.getItem("m3nova_username");
+
+let currentChatId =
+    localStorage.getItem("m3nova_current_chat_id");
 
 
 // ========================================
@@ -64,14 +74,26 @@ let currentChatId = localStorage.getItem("m3nova_current_chat_id");
 
 function openApp() {
 
+    if (!authScreen || !app) {
+        return;
+    }
+
     authScreen.classList.add("hidden");
     app.classList.remove("hidden");
 
-    userInfo.textContent = username || "User";
+    if (userInfo) {
+        userInfo.textContent =
+            username || "User";
+    }
+
 }
 
 
 function openAuth() {
+
+    if (!authScreen || !app) {
+        return;
+    }
 
     app.classList.add("hidden");
     authScreen.classList.remove("hidden");
@@ -85,31 +107,50 @@ function openAuth() {
 
 function showAuthMessage(text) {
 
-    authMessage.textContent = text || "";
+    if (authMessage) {
+        authMessage.textContent =
+            text || "";
+    }
 
 }
 
 
 // ========================================
-// SWITCH LOGIN / SIGNUP
+// LOGIN / SIGNUP SWITCH
 // ========================================
 
-showSignup.addEventListener("click", function () {
+if (showSignup) {
 
-    loginForm.classList.add("hidden");
-    signupForm.classList.remove("hidden");
-    authMessage.textContent = "";
+    showSignup.addEventListener(
+        "click",
+        function () {
 
-});
+            loginForm.classList.add("hidden");
+            signupForm.classList.remove("hidden");
+
+            showAuthMessage("");
+
+        }
+    );
+
+}
 
 
-showLogin.addEventListener("click", function () {
+if (showLogin) {
 
-    signupForm.classList.add("hidden");
-    loginForm.classList.remove("hidden");
-    authMessage.textContent = "";
+    showLogin.addEventListener(
+        "click",
+        function () {
 
-});
+            signupForm.classList.add("hidden");
+            loginForm.classList.remove("hidden");
+
+            showAuthMessage("");
+
+        }
+    );
+
+}
 
 
 // ========================================
@@ -118,46 +159,73 @@ showLogin.addEventListener("click", function () {
 
 async function signup() {
 
-    const newUsername = signupUsername.value.trim();
-    const newPassword = signupPassword.value.trim();
+    const newUsername =
+        signupUsername.value.trim();
 
-    if (newUsername === "" || newPassword === "") {
+    const newPassword =
+        signupPassword.value.trim();
 
-        showAuthMessage("Barcha maydonlarni to‘ldiring.");
+
+    if (
+        newUsername === "" ||
+        newPassword === ""
+    ) {
+
+        showAuthMessage(
+            "Barcha maydonlarni to‘ldiring."
+        );
+
         return;
 
     }
 
+
     signupButton.disabled = true;
     signupButton.textContent = "Creating...";
 
+
     try {
 
-        const response = await fetch("/signup", {
+        const response =
+            await fetch("/signup", {
 
-            method: "POST",
+                method: "POST",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
 
-            body: JSON.stringify({
-                username: newUsername,
-                password: newPassword
-            })
+                body: JSON.stringify({
 
-        });
+                    username:
+                        newUsername,
+
+                    password:
+                        newPassword
+
+                })
+
+            });
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
-        showAuthMessage(data.message);
+
+        showAuthMessage(
+            data.message || ""
+        );
 
 
         if (data.success) {
 
-            userToken = data.user_token;
-            username = data.username;
+            userToken =
+                data.user_token;
+
+            username =
+                data.username;
+
 
             localStorage.setItem(
                 "m3nova_user_token",
@@ -169,18 +237,27 @@ async function signup() {
                 username
             );
 
-            setTimeout(function () {
-openApp();
-                loadChats();
 
-            }, 500);
+            setTimeout(
+                function () {
+
+                    openApp();
+
+                    loadChats();
+
+                },
+                500
+            );
 
         }
 
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "SIGNUP ERROR:",
+            error
+        );
 
         showAuthMessage(
             "Server bilan bog‘lanib bo‘lmadi."
@@ -189,7 +266,9 @@ openApp();
     } finally {
 
         signupButton.disabled = false;
-        signupButton.textContent = "Create Account";
+
+        signupButton.textContent =
+            "Create Account";
 
     }
 
@@ -202,10 +281,17 @@ openApp();
 
 async function login() {
 
-    const loginUser = loginUsername.value.trim();
-    const loginPass = loginPassword.value.trim();
+    const loginUser =
+        loginUsername.value.trim();
 
-    if (loginUser === "" || loginPass === "") {
+    const loginPass =
+        loginPassword.value.trim();
+
+
+    if (
+        loginUser === "" ||
+        loginPass === ""
+    ) {
 
         showAuthMessage(
             "Username va parolni kiriting."
@@ -215,39 +301,57 @@ async function login() {
 
     }
 
+
     loginButton.disabled = true;
-    loginButton.textContent = "Signing in...";
+
+    loginButton.textContent =
+        "Signing in...";
 
 
     try {
 
-        const response = await fetch("/login", {
+        const response =
+            await fetch("/login", {
 
-            method: "POST",
+                method: "POST",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+                headers: {
 
-            body: JSON.stringify({
+                    "Content-Type":
+                        "application/json"
 
-                username: loginUser,
-                password: loginPass
+                },
 
-            })
+                body: JSON.stringify({
 
-        });
+                    username:
+                        loginUser,
+
+                    password:
+                        loginPass
+
+                })
+
+            });
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
-        showAuthMessage(data.message);
+
+        showAuthMessage(
+            data.message || ""
+        );
 
 
         if (data.success) {
 
-            userToken = data.user_token;
-            username = data.username;
+            userToken =
+                data.user_token;
+
+            username =
+                data.username;
+
 
             localStorage.setItem(
                 "m3nova_user_token",
@@ -260,20 +364,28 @@ async function login() {
             );
 
 
-            setTimeout(function () {
+            setTimeout(
+                async function () {
 
-                openApp();
-                loadChats();
-                loadCurrentChat();
+                    openApp();
 
-            }, 300);
+                    await loadChats();
+
+                    await loadCurrentChat();
+
+                },
+                300
+            );
 
         }
 
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "LOGIN ERROR:",
+            error
+        );
 
         showAuthMessage(
             "Server bilan bog‘lanib bo‘lmadi."
@@ -282,7 +394,9 @@ async function login() {
     } finally {
 
         loginButton.disabled = false;
-        loginButton.textContent = "Sign In";
+
+        loginButton.textContent =
+            "Sign In";
 
     }
 
@@ -293,55 +407,97 @@ async function login() {
 // AUTH BUTTONS
 // ========================================
 
-loginButton.addEventListener("click", login);
-signupButton.addEventListener("click", signup);
+if (loginButton) {
+
+    loginButton.addEventListener(
+        "click",
+        login
+    );
+
+}
+
+
+if (signupButton) {
+
+    signupButton.addEventListener(
+        "click",
+        signup
+    );
+
+}
 
 
 // ========================================
-// ENTER LOGIN
+// ENTER LOGIN / SIGNUP
 // ========================================
 
-loginPassword.addEventListener("keydown", function (event) {
+if (loginPassword) {
 
-    if (event.key === "Enter") {
+    loginPassword.addEventListener(
+        "keydown",
+        function (event) {
 
-        event.preventDefault();
-        login();
+            if (event.key === "Enter") {
 
-    }
+                event.preventDefault();
 
-});
+                login();
+
+            }
+
+        }
+    );
+
+}
 
 
-signupPassword.addEventListener("keydown", function (event) {
+if (signupPassword) {
 
-    if (event.key === "Enter") {
+    signupPassword.addEventListener(
+        "keydown",
+        function (event) {
 
-        event.preventDefault();
-        signup();
+            if (event.key === "Enter") {
 
-    }
+                event.preventDefault();
 
-});
+                signup();
+
+            }
+
+        }
+    );
+
+}
 
 
 // ========================================
-// CLEAR CHAT SCREEN
+// CLEAR CHAT
 // ========================================
 
 function clearChat() {
 
+    if (!chat) {
+        return;
+    }
+
+
     chat.innerHTML = "";
 
-    const welcome = document.createElement("div");
 
-    welcome.className = "welcome";
+    const welcome =
+        document.createElement("div");
+
+    welcome.className =
+        "welcome";
+
 
     welcome.innerHTML =
         '<div class="welcome-logo">M3</div>' +
         '<h1>Salom, men <span>M3NOVA</span></h1>' +
         '<p>Sizning premium sunʼiy intellekt yordamchingiz.</p>' +
         '<div class="welcome-line"></div>';
+
 
     chat.appendChild(welcome);
 
@@ -352,9 +508,19 @@ function clearChat() {
 // ADD MESSAGE
 // ========================================
 
-function addMessage(text, type) {
+function addMessage(
+    text,
+    type
+) {
 
-    const message = document.createElement("div");
+    if (!chat) {
+        return null;
+    }
+
+
+    const message =
+        document.createElement("div");
+
 
     message.className =
         "message " +
@@ -362,9 +528,12 @@ function addMessage(text, type) {
         " message-enter";
 
 
-    const name = document.createElement("div");
+    const name =
+        document.createElement("div");
 
-    name.className = "name";
+    name.className =
+        "name";
+
 
     name.textContent =
         type === "user"
@@ -372,33 +541,46 @@ function addMessage(text, type) {
             : "M3NOVA";
 
 
-    const content = document.createElement("div");
+    const content =
+        document.createElement("div");
 
-    content.className = "message-text";
+    content.className =
+        "message-text";
 
-    content.textContent = text || "";
+
+    content.textContent =
+        text || "";
 
 
     message.appendChild(name);
+
     message.appendChild(content);
 
     chat.appendChild(message);
 
 
-    requestAnimationFrame(function () {
+    requestAnimationFrame(
+        function () {
 
-        message.classList.add("show");
+            message.classList.add("show");
 
-    });
+        }
+    );
 
 
-    chat.scrollTop = chat.scrollHeight;
+    chat.scrollTop =
+        chat.scrollHeight;
 
-    if (type === "ai") {
 
-    speakM3NOVA(text);
+    if (
+        type === "ai" &&
+        text
+    ) {
 
-}
+        speakM3NOVA(text);
+
+    }
+
 
     return content;
 
@@ -410,32 +592,48 @@ function addMessage(text, type) {
 // ========================================
 
 function showTyping() {
-const message = document.createElement("div");
+
+    const message =
+        document.createElement("div");
+
 
     message.className =
         "message ai typing-message";
 
 
-    const name = document.createElement("div");
+    const name =
+        document.createElement("div");
 
-    name.className = "name";
-    name.textContent = "M3NOVA";
+    name.className =
+        "name";
+
+    name.textContent =
+        "M3NOVA";
 
 
-    const typing = document.createElement("div");
+    const typing =
+        document.createElement("div");
 
-    typing.className = "typing";
+    typing.className =
+        "typing";
+
 
     typing.innerHTML =
-        "<span></span><span></span><span></span>";
+        "<span></span>" +
+        "<span></span>" +
+        "<span></span>";
 
 
     message.appendChild(name);
+
     message.appendChild(typing);
 
     chat.appendChild(message);
 
-    chat.scrollTop = chat.scrollHeight;
+
+    chat.scrollTop =
+        chat.scrollHeight;
+
 
     return message;
 
@@ -451,6 +649,7 @@ async function createNewChat() {
     if (!userToken) {
 
         openAuth();
+
         return;
 
     }
@@ -458,38 +657,18 @@ async function createNewChat() {
 
     try {
 
-        const response = await fetch(
-            "/new-chat?user_token=" +
-            encodeURIComponent(userToken),
-            {
-                method: "POST"
-            }
-        );
+        const response =
+            await fetch(
+                "/new-chat?user_token=" +
+                encodeURIComponent(userToken),
+                {
+                    method: "POST"
+                }
+            );
 
 
-        const data = await response.json();
-
-        // ========================================
-// ADMIN AUTHENTICATION
-// ========================================
-
-if (data.admin_authenticated) {
-
-    adminToken = data.admin_token;
-
-    localStorage.setItem(
-        "m3nova_admin_token",
-        adminToken
-    );
-
-    if (adminPanel) {
-        adminPanel.classList.remove("hidden");
-    }
-
-    loadAdminStats();
-
-    return;
-}
+        const data =
+            await response.json();
 
 
         if (!data.success) {
@@ -504,7 +683,8 @@ if (data.admin_authenticated) {
         }
 
 
-        currentChatId = data.chat_id;
+        currentChatId =
+            data.chat_id;
 
 
         localStorage.setItem(
@@ -515,7 +695,10 @@ if (data.admin_authenticated) {
 
         clearChat();
 
-        sidebar.classList.remove("show");
+        sidebar.classList.remove(
+            "show"
+        );
+
 
         input.focus();
 
@@ -528,6 +711,7 @@ if (data.admin_authenticated) {
             "NEW CHAT ERROR:",
             error
         );
+
 
         alert(
             "Server bilan bog‘lanib bo‘lmadi."
@@ -551,13 +735,15 @@ async function loadChats() {
 
     try {
 
-        const response = await fetch(
-            "/chats?user_token=" +
-            encodeURIComponent(userToken)
-        );
+        const response =
+            await fetch(
+                "/chats?user_token=" +
+                encodeURIComponent(userToken)
+            );
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
         if (!data.success) {
@@ -583,74 +769,100 @@ async function loadChats() {
         }
 
 
-        data.chats.forEach(function (item) {
+        data.chats.forEach(
+            function (item) {
 
-            const button =
-                document.createElement("button");
-
-            button.className = "chat-item";
-
-
-            if (item.chat_id === currentChatId) {
-
-                button.classList.add("active");
-
-            }
+                const button =
+                    document.createElement(
+                        "button"
+                    );
 
 
-            const title =
-                document.createElement("div");
-
-            title.className =
-                "chat-item-title";
-
-            title.textContent =
-                item.title || "Yangi suhbat";
+                button.className =
+                    "chat-item";
 
 
-            const date =
-                document.createElement("div");
+                if (
+                    item.chat_id ===
+                    currentChatId
+                ) {
 
-            date.className =
-                "chat-item-date";
-
-
-            if (item.created_at) {
-
-                try {
-
-                    const chatDate =
-                        new Date(item.created_at);
-
-                    date.textContent =
-                        chatDate.toLocaleString();
-
-                } catch (error) {
-
-                    date.textContent = "";
+                    button.classList.add(
+                        "active"
+                    );
 
                 }
 
-            }
+
+                const title =
+                    document.createElement(
+                        "div"
+                    );
+
+                title.className =
+                    "chat-item-title";
 
 
-            button.appendChild(title);
-            button.appendChild(date);
+                title.textContent =
+                    item.title ||
+                    "Yangi suhbat";
 
 
-            button.addEventListener(
-                "click",
-                function () {
+                const date =
+                    document.createElement(
+                        "div"
+                    );
 
-                    openChat(item.chat_id);
+                date.className =
+                    "chat-item-date";
+
+
+                if (item.created_at) {
+
+                    try {
+
+                        const chatDate =
+                            new Date(
+                                item.created_at
+                            );
+
+
+                        date.textContent =
+                            chatDate.toLocaleString();
+
+                    } catch (error) {
+
+                        date.textContent =
+                            "";
+
+                    }
 
                 }
-            );
 
 
-            chatList.appendChild(button);
+                button.appendChild(title);
 
-        });
+                button.appendChild(date);
+
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        openChat(
+                            item.chat_id
+                        );
+
+                    }
+                );
+
+
+                chatList.appendChild(
+                    button
+                );
+
+            }
+        );
 
 
     } catch (error) {
@@ -677,15 +889,18 @@ async function openChat(chatId) {
 
 
     try {
-const response = await fetch(
-            "/history?user_token=" +
-            encodeURIComponent(userToken) +
-            "&chat_id=" +
-            encodeURIComponent(chatId)
-        );
+
+        const response =
+            await fetch(
+                "/history?user_token=" +
+                encodeURIComponent(userToken) +
+                "&chat_id=" +
+                encodeURIComponent(chatId)
+            );
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
         if (!data.success) {
@@ -693,7 +908,8 @@ const response = await fetch(
         }
 
 
-        currentChatId = chatId;
+        currentChatId =
+            chatId;
 
 
         localStorage.setItem(
@@ -722,6 +938,7 @@ const response = await fetch(
                             ? "user"
                             : "ai";
 
+
                     addMessage(
                         item.content,
                         type
@@ -733,7 +950,10 @@ const response = await fetch(
         }
 
 
-        sidebar.classList.remove("show");
+        sidebar.classList.remove(
+            "show"
+        );
+
 
         await loadChats();
 
@@ -756,33 +976,47 @@ const response = await fetch(
 // SIDEBAR
 // ========================================
 
-historyButton.addEventListener(
-    "click",
-    async function () {
+if (historyButton) {
 
-        sidebar.classList.toggle("show");
+    historyButton.addEventListener(
+        "click",
+        async function () {
+
+            sidebar.classList.toggle(
+                "show"
+            );
 
 
-        if (
-            sidebar.classList.contains("show")
-        ) {
+            if (
+                sidebar.classList.contains(
+                    "show"
+                )
+            ) {
 
-            await loadChats();
+                await loadChats();
+
+            }
 
         }
+    );
 
-    }
-);
+}
 
 
-closeSidebar.addEventListener(
-    "click",
-    function () {
+if (closeSidebar) {
 
-        sidebar.classList.remove("show");
+    closeSidebar.addEventListener(
+        "click",
+        function () {
 
-    }
-);
+            sidebar.classList.remove(
+                "show"
+            );
+
+        }
+    );
+
+}
 
 
 // ========================================
@@ -791,7 +1025,8 @@ closeSidebar.addEventListener(
 
 async function sendMessage() {
 
-    const message = input.value.trim();
+    const message =
+        input.value.trim();
 
 
     if (message === "") {
@@ -802,6 +1037,7 @@ async function sendMessage() {
     if (!userToken) {
 
         openAuth();
+
         return;
 
     }
@@ -813,13 +1049,16 @@ async function sendMessage() {
 
         try {
 
-            const response = await fetch(
-                "/new-chat?user_token=" +
-                encodeURIComponent(userToken),
-                {
-                    method: "POST"
-                }
-            );
+            const response =
+                await fetch(
+                    "/new-chat?user_token=" +
+                    encodeURIComponent(
+                        userToken
+                    ),
+                    {
+                        method: "POST"
+                    }
+                );
 
 
             const data =
@@ -855,7 +1094,9 @@ async function sendMessage() {
 
 
     const welcome =
-        chat.querySelector(".welcome");
+        chat.querySelector(
+            ".welcome"
+        );
 
 
     if (welcome) {
@@ -863,14 +1104,20 @@ async function sendMessage() {
     }
 
 
-    addMessage(message, "user");
+    addMessage(
+        message,
+        "user"
+    );
 
 
     input.value = "";
 
-    input.style.height = "auto";
+    input.style.height =
+        "auto";
 
-    sendButton.disabled = true;
+
+    sendButton.disabled =
+        true;
 
 
     const typingMessage =
@@ -880,33 +1127,37 @@ async function sendMessage() {
     try {
 
         const response =
-            await fetch("/chat", {
+            await fetch(
+                "/chat",
+                {
 
-                method: "POST",
+                    method: "POST",
 
-                headers: {
+                    headers: {
 
-                    "Content-Type":
-                        "application/json"
+                        "Content-Type":
+                            "application/json"
 
-                },
+                    },
 
-                body: JSON.stringify({
+                    body: JSON.stringify({
 
-                    message: message,
+                        message:
+                            message,
 
-                    user_token:
-                        userToken,
+                        user_token:
+                            userToken,
 
-                    owner_token:
-                        ownerToken,
+                        owner_token:
+                            ownerToken,
 
-                    chat_id:
-                        currentChatId
+                        chat_id:
+                            currentChatId
 
-                })
+                    })
 
-            });
+                }
+            );
 
 
         const data =
@@ -915,6 +1166,8 @@ async function sendMessage() {
 
         typingMessage.remove();
 
+
+        // LOGIN REQUIRED
 
         if (data.login_required) {
 
@@ -927,13 +1180,51 @@ async function sendMessage() {
         }
 
 
-        // OWNER AUTH
+        // ========================================
+        // ADMIN AUTHENTICATION
+        // ========================================
+
+        if (
+            data.admin_authenticated
+        ) {
+
+            adminToken =
+                data.admin_token;
+
+
+            localStorage.setItem(
+                "m3nova_admin_token",
+                adminToken
+            );
+
+
+            if (adminPanel) {
+
+                adminPanel.classList.remove(
+                    "hidden"
+                );
+
+            }
+
+
+            await loadAdminStats();
+
+            return;
+
+        }
+
+
+        // ========================================
+        // OWNER AUTHENTICATION
+        // ========================================
 
         if (data.owner_token) {
 
             ownerToken =
                 data.owner_token;
-localStorage.setItem(
+
+
+            localStorage.setItem(
                 "m3nova_owner_token",
                 ownerToken
             );
@@ -986,7 +1277,8 @@ localStorage.setItem(
 
     } finally {
 
-        sendButton.disabled = false;
+        sendButton.disabled =
+            false;
 
         input.focus();
 
@@ -999,19 +1291,28 @@ localStorage.setItem(
 // NEW CHAT BUTTON
 // ========================================
 
-newChatButton.addEventListener(
-    "click",
-    createNewChat
-);
+if (newChatButton) {
+
+    newChatButton.addEventListener(
+        "click",
+        createNewChat
+    );
+
+}
+
 
 // ========================================
 // SEND BUTTON
 // ========================================
 
-sendButton.addEventListener(
-    "click",
-    sendMessage
-);
+if (sendButton) {
+
+    sendButton.addEventListener(
+        "click",
+        sendMessage
+    );
+
+}
 
 
 // ========================================
@@ -1055,7 +1356,19 @@ async function logout() {
 
     clearChat();
 
-    sidebar.classList.remove("show");
+    sidebar.classList.remove(
+        "show"
+    );
+
+
+    if (adminPanel) {
+
+        adminPanel.classList.add(
+            "hidden"
+        );
+
+    }
+
 
     openAuth();
 
@@ -1084,10 +1397,19 @@ function clearLocalSession() {
         "m3nova_current_chat_id"
     );
 
+    localStorage.removeItem(
+        "m3nova_admin_token"
+    );
+
 
     userToken = null;
+
     ownerToken = null;
+
+    adminToken = null;
+
     username = null;
+
     currentChatId = null;
 
 }
@@ -1097,53 +1419,59 @@ function clearLocalSession() {
 // LOGOUT BUTTON
 // ========================================
 
-logoutButton.addEventListener(
-    "click",
-    logout
-);
+if (logoutButton) {
+
+    logoutButton.addEventListener(
+        "click",
+        logout
+    );
+
+}
 
 
 // ========================================
 // ENTER CHAT
 // ========================================
 
-input.addEventListener(
-    "keydown",
-    function (event) {
+if (input) {
 
-        if (
-            event.key === "Enter" &&
-            !event.shiftKey
-        ) {
+    input.addEventListener(
+        "keydown",
+        function (event) {
 
-            event.preventDefault();
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
 
-            sendMessage();
+                event.preventDefault();
+
+                sendMessage();
+
+            }
 
         }
-
-    }
-);
+    );
 
 
-// ========================================
-// AUTO HEIGHT
-// ========================================
+    input.addEventListener(
+        "input",
+        function () {
 
-input.addEventListener(
-    "input",
-    function () {
+            this.style.height =
+                "auto";
 
-        this.style.height = "auto";
 
-        this.style.height =
-            Math.min(
-                this.scrollHeight,
-                150
-            ) + "px";
+            this.style.height =
+                Math.min(
+                    this.scrollHeight,
+                    150
+                ) + "px";
 
-    }
-);
+        }
+    );
+
+}
 
 
 // ========================================
@@ -1169,9 +1497,13 @@ async function loadCurrentChat() {
         const response =
             await fetch(
                 "/history?user_token=" +
-                encodeURIComponent(userToken) +
+                encodeURIComponent(
+                    userToken
+                ) +
                 "&chat_id=" +
-                encodeURIComponent(currentChatId)
+                encodeURIComponent(
+                    currentChatId
+                )
             );
 
 
@@ -1193,8 +1525,9 @@ async function loadCurrentChat() {
 
                     const type =
                         item.role === "user"
-                        ? "user"
+                            ? "user"
                             : "ai";
+
 
                     addMessage(
                         item.content,
@@ -1218,9 +1551,409 @@ async function loadCurrentChat() {
             error
         );
 
+
         clearChat();
 
     }
+
+}
+
+
+// ========================================
+// ADMIN STATISTICS
+// ========================================
+
+async function loadAdminStats() {
+
+    if (!adminToken) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/admin/stats?admin_token=" +
+                adminToken
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (data.error) {
+
+            console.error(
+                "ADMIN ERROR:",
+                data.error
+            );
+
+            return;
+
+        }
+
+
+        // TOTAL VISITORS
+
+        const totalVisitors =
+            document.getElementById(
+                "totalVisitors"
+            );
+
+
+        if (totalVisitors) {
+
+            totalVisitors.textContent =
+                data.total_visitors ?? 0;
+
+        }
+
+
+        // ONLINE
+
+        const onlineNow =
+            document.getElementById(
+                "onlineNow"
+            );
+
+
+        if (onlineNow) {
+
+            onlineNow.textContent =
+                data.online_now ?? 0;
+
+        }
+
+
+        // USERS
+
+        const totalUsers =
+            document.getElementById(
+                "totalUsers"
+            );
+
+
+        if (totalUsers) {
+
+            totalUsers.textContent =
+                data.total_users ?? 0;
+
+        }
+
+
+        // COUNTRIES
+
+        const countriesList =
+            document.getElementById(
+                "countriesList"
+            );
+
+
+        if (countriesList) {
+
+            if (
+                !data.countries ||
+                data.countries.length === 0
+            ) {
+
+                countriesList.textContent =
+                    "Hozircha ma'lumot yo‘q.";
+
+            } else {
+
+                countriesList.innerHTML =
+                    data.countries
+                        .map(
+                            function (item) {
+
+                                return (
+                                    `<div>${item.country} — ${item.count}</div>`
+                                );
+
+                            }
+                        )
+                        .join("");
+
+            }
+
+        }
+
+
+        // DEVICES
+
+        const devicesList =
+            document.getElementById(
+                "devicesList"
+            );
+
+
+        if (devicesList) {
+
+            if (
+                !data.devices ||
+                data.devices.length === 0
+            ) {
+
+                devicesList.textContent =
+                    "Hozircha ma'lumot yo‘q.";
+
+            } else {
+
+                devicesList.innerHTML =
+                    data.devices
+                        .map(
+                            function (item) {
+
+                                return (
+                                    `<div>${item.device} — ${item.count}</div>`
+                                );
+
+                            }
+                        )
+                        .join("");
+
+            }
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "ADMIN STATS ERROR:",
+            error
+        );
+
+    }
+
+}
+
+
+// ========================================
+// CLOSE ADMIN PANEL
+// ========================================
+
+if (closeAdminPanel) {
+
+    closeAdminPanel.addEventListener(
+        "click",
+        function () {
+
+            if (adminPanel) {
+
+                adminPanel.classList.add(
+                    "hidden"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+// ========================================
+// VOICE RECOGNITION
+// ========================================
+
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+
+if (
+    SpeechRecognition &&
+    micButton
+) {
+
+    const recognition =
+        new SpeechRecognition();
+
+
+    recognition.lang =
+        "uz-UZ";
+
+
+    recognition.continuous =
+        false;
+
+
+    recognition.interimResults =
+        false;
+
+
+    micButton.addEventListener(
+        "click",
+        function () {
+
+            try {
+
+                recognition.start();
+
+            } catch (error) {
+
+                console.error(
+                    "VOICE START ERROR:",
+                    error
+                );
+
+            }
+
+        }
+    );
+
+
+    recognition.onstart =
+        function () {
+
+            micButton.classList.add(
+                "listening"
+            );
+
+        };
+
+
+    recognition.onend =
+        function () {
+
+            micButton.classList.remove(
+                "listening"
+            );
+
+        };
+
+
+    recognition.onresult =
+        function (event) {
+
+            const voiceText =
+                event.results[0][0]
+                    .transcript;
+
+
+            input.value =
+                voiceText;
+
+
+            sendMessage();
+
+        };
+
+
+    recognition.onerror =
+        function (event) {
+
+            console.error(
+                "VOICE ERROR:",
+                event.error
+            );
+
+
+            micButton.classList.remove(
+                "listening"
+            );
+
+        };
+
+} else {
+
+    console.log(
+        "Speech Recognition qo‘llab-quvvatlanmaydi."
+    );
+
+}
+
+
+// ========================================
+// M3NOVA VOICE
+// ========================================
+
+function speakM3NOVA(text) {
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+
+        return;
+
+    }
+
+
+    window.speechSynthesis.cancel();
+
+
+    const speech =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+
+    speech.lang =
+        "uz-UZ";
+
+
+    speech.rate =
+        1;
+
+
+    speech.pitch =
+        1.15;
+
+
+    const voices =
+        window.speechSynthesis
+            .getVoices();
+
+
+    const femaleVoice =
+        voices.find(
+            function (voice) {
+
+                const name =
+                    voice.name.toLowerCase();
+
+
+                return (
+                    name.includes("female") ||
+                    name.includes("zira") ||
+                    name.includes("samantha") ||
+                    name.includes(
+                        "google uk english female"
+                    )
+                );
+
+            }
+        );
+
+
+    if (femaleVoice) {
+
+        speech.voice =
+            femaleVoice;
+
+    }
+
+
+    window.speechSynthesis.speak(
+        speech
+    );
+
+}
+
+
+if (
+    "speechSynthesis" in window
+) {
+
+    window.speechSynthesis.onvoiceschanged =
+        function () {
+
+            window.speechSynthesis.getVoices();
+
+        };
 
 }
 
@@ -1251,274 +1984,4 @@ async function initializeApp() {
 }
 
 
-// ========================================
-// START
-// ========================================
-
 initializeApp();
-
-// ========================================
-// VOICE RECOGNITION
-// ========================================
-
-const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
-
-
-if (SpeechRecognition) {
-
-    const recognition =
-        new SpeechRecognition();
-
-    recognition.lang = "uz-UZ";
-
-    recognition.continuous = false;
-
-    recognition.interimResults = false;
-
-
-    micButton.addEventListener(
-        "click",
-        function () {
-
-            recognition.start();
-
-        }
-    );
-
-
-    recognition.onstart =
-        function () {
-
-            micButton.classList.add(
-                "listening"
-            );
-
-        };
-
-
-    recognition.onend =
-        function () {
-
-            micButton.classList.remove(
-                "listening"
-            );
-
-        };
-
-
-    recognition.onresult =
-        function (event) {
-
-            const voiceText =
-                event.results[0][0].transcript;
-
-
-            input.value =
-                voiceText;
-
-
-            // AUTOMATIC SEND
-
-            sendMessage();
-
-        };
-
-
-    recognition.onerror =
-        function (event) {
-
-            console.error(
-                "VOICE ERROR:",
-                event.error
-            );
-
-            micButton.classList.remove(
-                "listening"
-            );
-
-        };
-
-} else {
-
-    console.log(
-        "Speech Recognition qo'llab-quvvatlanmaydi."
-    );
-
-}
-
-// ========================================
-// M3NOVA VOICE
-// ========================================
-
-function speakM3NOVA(text) {
-
-    if (!("speechSynthesis" in window)) {
-        return;
-    }
-
-    window.speechSynthesis.cancel();
-
-    const speech =
-        new SpeechSynthesisUtterance(text);
-
-    speech.lang = "uz-UZ";
-    speech.rate = 1;
-    speech.pitch = 1.15;
-
-    const voices =
-        window.speechSynthesis.getVoices();
-
-    const femaleVoice =
-        voices.find(
-            voice =>
-                voice.name.toLowerCase().includes("female") ||
-                voice.name.toLowerCase().includes("zira") ||
-                voice.name.toLowerCase().includes("samantha") ||
-                voice.name.toLowerCase().includes("google uk english female")
-        );
-
-    if (femaleVoice) {
-        speech.voice = femaleVoice;
-    }
-
-    window.speechSynthesis.speak(speech);
-}
-
-
-window.speechSynthesis.onvoiceschanged =
-    function () {
-        window.speechSynthesis.getVoices();
-    };
-
-    // ========================================
-// LOAD ADMIN STATS
-// ========================================
-
-async function loadAdminStats() {
-
-    if (!adminToken) {
-        return;
-    }
-
-    try {
-
-       const response = await fetch(
-    "/admin/stats?admin_token=" + adminToken
-);
-
-        const data = await response.json();
-
-        if (data.error) {
-            console.error("ADMIN ERROR:", data.error);
-            return;
-        }
-
-
-        // TOTAL VISITORS
-
-        const totalVisitors =
-            document.getElementById("totalVisitors");
-
-        if (totalVisitors) {
-            totalVisitors.textContent =
-                data.total_visitors ?? 0;
-        }
-
-
-        // ONLINE USERS
-
-        const onlineNow =
-            document.getElementById("onlineNow");
-
-        if (onlineNow) {
-            onlineNow.textContent =
-                data.online_now ?? 0;
-        }
-
-
-        // REGISTERED USERS
-
-        const totalUsers =
-            document.getElementById("totalUsers");
-
-        if (totalUsers) {
-            totalUsers.textContent =
-                data.total_users ?? 0;
-        }
-
-
-        // COUNTRIES
-
-        const countriesList =
-            document.getElementById("countriesList");
-
-        if (countriesList) {
-
-            if (!data.countries?.length) {
-
-                countriesList.textContent =
-                    "Hozircha ma'lumot yo'q.";
-
-            } else {
-
-                countriesList.innerHTML =
-                    data.countries
-                        .map(item =>
-                            <div>${item.country} — ${item.count}</div>
-                        )
-                        .join("");
-
-            }
-        }
-
-
-        // DEVICES
-
-        const devicesList =
-            document.getElementById("devicesList");
-
-        if (devicesList) {
-
-            if (!data.devices?.length) {
-
-                devicesList.textContent =
-                    "Hozircha ma'lumot yo'q.";
-
-            } else {
-
-                devicesList.innerHTML =
-                    data.devices
-                        .map(item =>
-                            <div>${item.device} — ${item.count}</div>
-                        )
-                        .join("");
-
-            }
-        }
-
-    } catch (error) {
-
-        console.error(
-            "ADMIN STATS ERROR:",
-            error
-        );
-
-    }
-}
-
-if (closeAdminPanel) {
-
-    closeAdminPanel.addEventListener(
-        "click",
-        () => {
-
-            adminPanel.classList.add(
-                "hidden"
-            );
-
-        }
-    );
-
-}
