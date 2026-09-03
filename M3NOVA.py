@@ -38,6 +38,8 @@ if not GEMINI_API_KEY:
 
 if not OWNER_CODE:
     raise RuntimeError("OWNER_CODE topilmadi.")
+if not ADMIN_CODE:
+    raise RuntimeError("ADMIN_CODE topilmadi.")
 
 
 # ==================================================
