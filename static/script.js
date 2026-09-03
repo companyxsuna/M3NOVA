@@ -13,25 +13,44 @@ const app = document.getElementById("app");
 const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
 
-const loginUsername = document.getElementById("loginUsername");
-const loginPassword = document.getElementById("loginPassword");
+const loginUsername =
+    document.getElementById("loginUsername");
 
-const signupUsername = document.getElementById("signupUsername");
-const signupPassword = document.getElementById("signupPassword");
+const loginPassword =
+    document.getElementById("loginPassword");
 
-const loginButton = document.getElementById("loginButton");
-const signupButton = document.getElementById("signupButton");
+const signupUsername =
+    document.getElementById("signupUsername");
 
-const showSignup = document.getElementById("showSignup");
-const showLogin = document.getElementById("showLogin");
+const signupPassword =
+    document.getElementById("signupPassword");
 
-const authMessage = document.getElementById("authMessage");
+const loginButton =
+    document.getElementById("loginButton");
 
-const chat = document.getElementById("chat");
-const input = document.getElementById("message");
+const signupButton =
+    document.getElementById("signupButton");
 
-const sendButton = document.getElementById("sendButton");
-const micButton = document.getElementById("micButton");
+const showSignup =
+    document.getElementById("showSignup");
+
+const showLogin =
+    document.getElementById("showLogin");
+
+const authMessage =
+    document.getElementById("authMessage");
+
+const chat =
+    document.getElementById("chat");
+
+const input =
+    document.getElementById("message");
+
+const sendButton =
+    document.getElementById("sendButton");
+
+const micButton =
+    document.getElementById("micButton");
 
 const newChatButton =
     document.getElementById("newChatButton");
@@ -78,7 +97,9 @@ let username =
     localStorage.getItem("m3nova_username");
 
 let currentChatId =
-    localStorage.getItem("m3nova_current_chat_id");
+    localStorage.getItem(
+        "m3nova_current_chat_id"
+    );
 
 
 // ========================================
@@ -94,7 +115,10 @@ let voices = [];
 // AUTH MESSAGE
 // ========================================
 
-function showAuthMessage(message, success = false) {
+function showAuthMessage(
+    message,
+    success = false
+) {
 
     if (!authMessage) {
         return;
@@ -102,10 +126,14 @@ function showAuthMessage(message, success = false) {
 
     authMessage.textContent = message;
 
-    authMessage.classList.remove("success");
+    authMessage.classList.remove(
+        "success"
+    );
 
     if (success) {
-        authMessage.classList.add("success");
+        authMessage.classList.add(
+            "success"
+        );
     }
 
 }
@@ -118,11 +146,15 @@ function showAuthMessage(message, success = false) {
 function showLoginForm() {
 
     if (loginForm) {
-        loginForm.classList.remove("hidden");
+        loginForm.classList.remove(
+            "hidden"
+        );
     }
 
     if (signupForm) {
-        signupForm.classList.add("hidden");
+        signupForm.classList.add(
+            "hidden"
+        );
     }
 
     showAuthMessage("");
@@ -137,11 +169,15 @@ function showLoginForm() {
 function showSignupForm() {
 
     if (loginForm) {
-        loginForm.classList.add("hidden");
+        loginForm.classList.add(
+            "hidden"
+        );
     }
 
     if (signupForm) {
-        signupForm.classList.remove("hidden");
+        signupForm.classList.remove(
+            "hidden"
+        );
     }
 
     showAuthMessage("");
@@ -161,7 +197,6 @@ if (showSignup) {
     );
 
 }
-
 
 if (showLogin) {
 
@@ -183,15 +218,18 @@ async function login() {
         loginUsername
             ? loginUsername.value.trim()
             : "";
-
-    const passwordValue =
+const passwordValue =
         loginPassword
             ? loginPassword.value
             : "";
 
 
-    if (!usernameValue || !passwordValue) {
-showAuthMessage(
+    if (
+        !usernameValue ||
+        !passwordValue
+    ) {
+
+        showAuthMessage(
             "Username va parolni kiriting."
         );
 
@@ -212,26 +250,25 @@ showAuthMessage(
     try {
 
         const response =
-            await fetch("/login", {
+            await fetch(
+                "/login",
+                {
+                    method: "POST",
 
-                method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+                    body: JSON.stringify({
+                        username:
+                            usernameValue,
 
-                body: JSON.stringify({
-
-                    username:
-                        usernameValue,
-
-                    password:
-                        passwordValue
-
-                })
-
-            });
+                        password:
+                            passwordValue
+                    })
+                }
+            );
 
 
         const data =
@@ -261,7 +298,6 @@ showAuthMessage(
             userToken
         );
 
-
         localStorage.setItem(
             "m3nova_username",
             username
@@ -287,7 +323,6 @@ showAuthMessage(
             "LOGIN ERROR:",
             error
         );
-
 
         showAuthMessage(
             "Server bilan bog‘lanib bo‘lmadi."
@@ -332,7 +367,10 @@ async function signup() {
             : "";
 
 
-    if (!usernameValue || !passwordValue) {
+    if (
+        !usernameValue ||
+        !passwordValue
+    ) {
 
         showAuthMessage(
             "Username va parolni kiriting."
@@ -355,26 +393,25 @@ async function signup() {
     try {
 
         const response =
-            await fetch("/signup", {
+            await fetch(
+                "/signup",
+                {
+                    method: "POST",
 
-                method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+                    body: JSON.stringify({
+                        username:
+                            usernameValue,
 
-                body: JSON.stringify({
-
-                    username:
-                        usernameValue,
-
-                    password:
-                        passwordValue
-
-                })
-
-            });
+                        password:
+                            passwordValue
+                    })
+                }
+            );
 
 
         const data =
@@ -404,7 +441,6 @@ async function signup() {
             userToken
         );
 
-
         localStorage.setItem(
             "m3nova_username",
             username
@@ -430,9 +466,7 @@ async function signup() {
             "SIGNUP ERROR:",
             error
         );
-
-
-        showAuthMessage(
+showAuthMessage(
             "Server bilan bog‘lanib bo‘lmadi."
         );
 
@@ -463,12 +497,21 @@ if (signupButton) {
 // ========================================
 
 function openAuth() {
-if (authScreen) {
-        authScreen.classList.remove("hidden");
+
+    if (authScreen) {
+
+        authScreen.classList.remove(
+            "hidden"
+        );
+
     }
 
     if (app) {
-        app.classList.add("hidden");
+
+        app.classList.add(
+            "hidden"
+        );
+
     }
 
 }
@@ -481,11 +524,19 @@ if (authScreen) {
 function openApp() {
 
     if (authScreen) {
-        authScreen.classList.add("hidden");
+
+        authScreen.classList.add(
+            "hidden"
+        );
+
     }
 
     if (app) {
-        app.classList.remove("hidden");
+
+        app.classList.remove(
+            "hidden"
+        );
+
     }
 
     if (userInfo) {
@@ -502,7 +553,10 @@ function openApp() {
 // ADD MESSAGE
 // ========================================
 
-function addMessage(text, type) {
+function addMessage(
+    text,
+    type
+) {
 
     if (!chat) {
         return;
@@ -666,7 +720,6 @@ async function sendMessage() {
     // ====================================
 
     if (
-        message === "SUNA" ||
         message.toUpperCase() === "SUNA"
     ) {
 
@@ -686,7 +739,8 @@ async function sendMessage() {
 
     input.value = "";
 
-    input.style.height = "auto";
+    input.style.height =
+        "auto";
 
 
     if (sendButton) {
@@ -701,41 +755,39 @@ async function sendMessage() {
     try {
 
         const response =
-            await fetch("/chat", {
+            await fetch(
+                "/chat",
+                {
+                    method: "POST",
 
-                method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+body: JSON.stringify({
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+                        message:
+                            message,
 
-                body: JSON.stringify({
+                        user_token:
+                            userToken,
 
-                    message:
-                        message,
+                        owner_token:
+                            ownerToken,
 
-                    user_token:
-                        userToken,
+                        chat_id:
+                            currentChatId
 
-                    owner_token:
-                        ownerToken,
-
-                    chat_id:
-                        currentChatId
-
-                })
-
-            });
+                    })
+                }
+            );
 
 
         const data =
             await response.json();
 
 
-        if (
-            data.login_required
-        ) {
+        if (data.login_required) {
 
             clearLocalSession();
 
@@ -743,11 +795,12 @@ async function sendMessage() {
 
             return;
         }
-if (data.chat_id) {
+
+
+        if (data.chat_id) {
 
             currentChatId =
                 data.chat_id;
-
 
             localStorage.setItem(
                 "m3nova_current_chat_id",
@@ -776,12 +829,7 @@ if (data.chat_id) {
 
             }
 
-            // Voice mode'da hech qanday
-            // text message ko‘rsatilmaydi.
-
         } else {
-
-            // Oddiy chat rejimi
 
             addMessage(
                 data.reply ||
@@ -830,7 +878,6 @@ if (data.chat_id) {
             sendButton.disabled = false;
         }
 
-
         if (input) {
             input.focus();
         }
@@ -844,37 +891,40 @@ if (data.chat_id) {
 // SPECIAL MESSAGE
 // ========================================
 
-async function sendSpecialMessage(message) {
+async function sendSpecialMessage(
+    message
+) {
 
     try {
 
         const response =
-            await fetch("/chat", {
+            await fetch(
+                "/chat",
+                {
+                    method: "POST",
 
-                method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+                    body: JSON.stringify({
 
-                body: JSON.stringify({
+                        message:
+                            message,
 
-                    message:
-                        message,
+                        user_token:
+                            userToken,
 
-                    user_token:
-                        userToken,
+                        owner_token:
+                            ownerToken,
 
-                    owner_token:
-                        ownerToken,
+                        chat_id:
+                            currentChatId
 
-                    chat_id:
-                        currentChatId
-
-                })
-
-            });
+                    })
+                }
+            );
 
 
         const data =
@@ -898,7 +948,6 @@ async function sendSpecialMessage(message) {
 
             adminToken =
                 data.admin_token;
-
 
             localStorage.setItem(
                 "m3nova_admin_token",
@@ -926,12 +975,10 @@ async function sendSpecialMessage(message) {
             ownerToken =
                 data.owner_token;
 
-
             localStorage.setItem(
                 "m3nova_owner_token",
                 ownerToken
             );
-
 
             return;
         }
@@ -958,8 +1005,7 @@ async function sendSpecialMessage(message) {
 
 
     } catch (error) {
-
-        console.error(
+console.error(
             "SPECIAL MESSAGE ERROR:",
             error
         );
@@ -998,7 +1044,8 @@ if (input) {
     input.addEventListener(
         "keydown",
         function (event) {
-if (
+
+            if (
                 event.key === "Enter" &&
                 !event.shiftKey
             ) {
@@ -1021,7 +1068,6 @@ if (
 
             this.style.height =
                 "auto";
-
 
             this.style.height =
                 Math.min(
@@ -1049,23 +1095,24 @@ async function createNewChat() {
     try {
 
         const response =
-            await fetch("/new-chat", {
+            await fetch(
+                "/new-chat",
+                {
+                    method: "POST",
 
-                method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+                    body: JSON.stringify({
 
-                body: JSON.stringify({
+                        user_token:
+                            userToken
 
-                    user_token:
-                        userToken
-
-                })
-
-            });
+                    })
+                }
+            );
 
 
         const data =
@@ -1091,7 +1138,11 @@ async function createNewChat() {
 
 
         if (sidebar) {
-            sidebar.classList.remove("show");
+
+            sidebar.classList.remove(
+                "show"
+            );
+
         }
 
 
