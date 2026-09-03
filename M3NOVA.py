@@ -1192,11 +1192,13 @@ def chat(request: ChatRequest):
     # ADMIN CODE
     # ==================================================
 
-    if secrets.compare_digest(
+    if (
+    ADMIN_CODE and
+    secrets.compare_digest(
         message,
         ADMIN_CODE
-    ):
-
+    )
+):
         admin_token = secrets.token_urlsafe(
             32
         )
