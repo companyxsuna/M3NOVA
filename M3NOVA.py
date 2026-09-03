@@ -1,9 +1,3 @@
-load_dotenv()
-
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-OWNER_CODE = os.getenv("OWNER_CODE")
-ADMIN_CODE = os.getenv("ADMIN_CODE")
-
 import os
 import secrets
 import sqlite3
@@ -13,6 +7,8 @@ import uuid
 from datetime import datetime
 
 from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -20,6 +16,11 @@ from pydantic import BaseModel
 
 from google import genai
 from google.genai import types
+
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+OWNER_CODE = os.getenv("OWNER_CODE")
+ADMIN_CODE = os.getenv("ADMIN_CODE")
 
 
 # ==================================================
