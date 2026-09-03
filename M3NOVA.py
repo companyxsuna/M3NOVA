@@ -1,3 +1,9 @@
+load_dotenv()
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+OWNER_CODE = os.getenv("OWNER_CODE")
+ADMIN_CODE = os.getenv("ADMIN_CODE")
+
 import os
 import secrets
 import sqlite3
@@ -1126,196 +1132,114 @@ def admin_stats(admin_token: str | None = None):
 @app.post("/chat")
 def chat(request: ChatRequest):
 
-    # ==================================================
-    # MESSAGE
-    # ==================================================
-
     message = request.message.strip()
 
-
     if not message:
-
         return {
-
-            "reply":
-            "Iltimos, xabar yozing."
+            "reply": "Iltimos, xabar yozing."
         }
 
+    # ==============================
+    # LOGIN
+    # ==============================
 
-    # ==================================================
-    # CHECK LOGIN
-    # ==================================================
-
-    current_user = get_current_user(
-        request.user_token
-    )
-
+    current_user = get_current_user(request.user_token)
 
     if not current_user:
-
         return {
-
-            "reply":
-            "Iltimos, avval tizimga kiring.",
-
-            "login_required":
-            True
+            "reply": "Iltimos, avval tizimga kiring.",
+            "login_required": True
         }
 
+    user_id = current_user["user_id"]
+    username = current_user["username"]
 
-    # ==================================================
-    # CURRENT USER
-    # ==================================================
-
-    user_id = current_user[
-        "user_id"
-    ]
-
-
-    username = current_user[
-        "username"
-    ]
-
-
-    # ==================================================
+    # ==============================
     # CHAT ID
-    # ==================================================
+    # ==============================
 
     chat_id = request.chat_id
 
-
     if not chat_id:
-
         chat_id = create_chat_id()
 
-        # ==================================================
-    # ADMIN CODE
-    # ==================================================
+    # ==============================
+    # ADMIN AUTHENTICATION
+    # ==============================
 
-    if (
-    ADMIN_CODE and
-    secrets.compare_digest(
+    if ADMIN_CODE and secrets.compare_digest(
         message,
         ADMIN_CODE
-    )
-):
-        admin_token = secrets.token_urlsafe(
-            32
-        )
+    ):
 
-        admin_sessions.add(
-            admin_token
-        )
+        admin_token = secrets.token_urlsafe(32)
+
+        admin_sessions.add(admin_token)
 
         return {
-
-            "reply":
-            "🛡️ Admin panel tasdiqlandi.",
-
-            "admin_authenticated":
-            True,
-
-            "admin_token":
-            admin_token,
-
-            "chat_id":
-            chat_id
+            "reply": "🛡️ Admin panel tasdiqlandi.",
+            "admin_authenticated": True,
+            "admin_token": admin_token,
+            "chat_id": chat_id
         }
 
+    # ==============================
+    # OWNER AUTHENTICATION
+    # ==============================
 
-    # ==================================================
-    # OWNER CODE
-    # ==================================================
-
-    if secrets.compare_digest(
+    if OWNER_CODE and secrets.compare_digest(
         message,
         OWNER_CODE
     ):
 
-        owner_token = secrets.token_urlsafe(
-            32
-        )
+        owner_token = secrets.token_urlsafe(32)
 
-
-        owner_sessions.add(
-            owner_token
-        )
-
+        owner_sessions.add(owner_token)
 
         return {
-
-            "reply": (
-                "🔐 Tasdiqlandi.\n\n"
-                "Siz M3NOVA loyihasi "
-                "asoschilaridan biri sifatida "
-                "tanildingiz."
-            ),
-
-            "owner_authenticated":
-            True,
-
-            "owner_token":
-            owner_token,
-
-            "chat_id":
-            chat_id
+            "reply": "🔐 Tasdiqlandi.",
+            "owner_authenticated": True,
+            "owner_token": owner_token,
+            "chat_id": chat_id
         }
 
-
-    # ==================================================
+    # ==============================
     # CHECK OWNER
-    # ==================================================
+    # ==============================
 
-    is_owner = (
+    is_owner = False
 
-        request.owner_token is not None
+    if request.owner_token:
+        if request.owner_token in owner_sessions:
+            is_owner = True
 
-        and
-
-        request.owner_token
-        in owner_sessions
-    )
-
-
-    # ==================================================
-    # GET CHAT MEMORY
-    # ==================================================
+    # ==============================
+    # CHAT HISTORY
+    # ==============================
 
     history_text = get_chat_history(
-
         user_id,
-
         chat_id
     )
 
-
-    # ==================================================
+    # ==============================
     # SAVE USER MESSAGE
-    # ==================================================
+    # ==============================
 
     save_message(
-
         user_id,
-
         chat_id,
-
         "user",
-
         message
     )
 
-
-    # ==================================================
+    # ==============================
     # GEMINI
-    # ==================================================
+    # ==============================
 
     try:
 
-        response = client.models.generate_content(
-
-            model="gemini-3.6-flash",
-
-            contents=f"""
+        prompt = f"""
 Conversation history:
 
 {history_text}
@@ -1323,79 +1247,51 @@ Conversation history:
 Current user message:
 
 {message}
-""",
+"""
 
+        response = client.models.generate_content(
+            model="gemini-3.6-flash",
+            contents=prompt,
             config=types.GenerateContentConfig(
-
                 system_instruction=system_prompt(
-
                     is_owner,
-
                     username
                 ),
-
                 thinking_config=types.ThinkingConfig(
-
                     thinking_level="LOW"
                 )
             )
         )
 
-
         reply = response.text
 
-
         if not reply:
+            reply = "M3NOVA javob qaytara olmadi."
 
-            reply = (
-
-                "M3NOVA javob "
-                "qaytara olmadi."
-            )
-
-
-        # ==================================================
-        # SAVE AI MESSAGE
-        # ==================================================
+        # ==============================
+        # SAVE AI RESPONSE
+        # ==============================
 
         save_message(
-
             user_id,
-
             chat_id,
-
             "assistant",
-
             reply
         )
 
-
         return {
-
-            "reply":
-            reply,
-
-            "chat_id":
-            chat_id
+            "reply": reply,
+            "chat_id": chat_id
         }
-
 
     except Exception as error:
 
         print(
-
             "M3NOVA ERROR:",
-
             repr(error)
         )
 
-
         return {
-"reply": (
-                "M3NOVA AI bilan bog‘lanishda "
-                "xatolik yuz berdi."
-            ),
-
-            "chat_id":
-            chat_id
+            "reply": "M3NOVA AI bilan bog‘lanishda xatolik yuz berdi.",
+            "chat_id": chat_id
         }
