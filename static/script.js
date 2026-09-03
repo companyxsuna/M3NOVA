@@ -193,300 +193,69 @@ if (showSignup) {
 
     showSignup.addEventListener(
         "click",
-        showSignupForm
+        function (event) {
+
+            event.preventDefault();
+
+            showSignupForm();
+
+        }
     );
 
 }
+
 
 if (showLogin) {
 
     showLogin.addEventListener(
         "click",
-        showLoginForm
+        function (event) {
+
+            event.preventDefault();
+
+            showLoginForm();
+
+        }
     );
 
 }
 
 
 // ========================================
-// LOGIN
+// LOGIN FORM SUBMIT
 // ========================================
 
-async function login() {
+if (loginForm) {
 
-    const usernameValue =
-        loginUsername
-            ? loginUsername.value.trim()
-            : "";
-const passwordValue =
-        loginPassword
-            ? loginPassword.value
-            : "";
+    loginForm.addEventListener(
+        "submit",
+        function (event) {
 
+            event.preventDefault();
 
-    if (
-        !usernameValue ||
-        !passwordValue
-    ) {
+            login();
 
-        showAuthMessage(
-            "Username va parolni kiriting."
-        );
-
-        return;
-    }
-
-
-    if (loginButton) {
-        loginButton.disabled = true;
-    }
-
-
-    showAuthMessage(
-        "Tizimga kirilmoqda..."
-    );
-
-
-    try {
-
-        const response =
-            await fetch(
-                "/login",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        username:
-                            usernameValue,
-
-                        password:
-                            passwordValue
-                    })
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (!data.success) {
-
-            showAuthMessage(
-                data.message ||
-                "Login amalga oshmadi."
-            );
-
-            return;
         }
-
-
-        userToken =
-            data.user_token;
-
-        username =
-            data.username;
-
-
-        localStorage.setItem(
-            "m3nova_user_token",
-            userToken
-        );
-
-        localStorage.setItem(
-            "m3nova_username",
-            username
-        );
-
-
-        showAuthMessage(
-            "Muvaffaqiyatli kirdingiz.",
-            true
-        );
-
-
-        openApp();
-
-        await loadChats();
-
-        await loadCurrentChat();
-
-
-    } catch (error) {
-
-        console.error(
-            "LOGIN ERROR:",
-            error
-        );
-
-        showAuthMessage(
-            "Server bilan bog‘lanib bo‘lmadi."
-        );
-
-
-    } finally {
-
-        if (loginButton) {
-            loginButton.disabled = false;
-        }
-
-    }
-
-}
-
-
-if (loginButton) {
-
-    loginButton.addEventListener(
-        "click",
-        login
     );
 
 }
 
 
 // ========================================
-// SIGN UP
+// SIGNUP FORM SUBMIT
 // ========================================
 
-async function signup() {
+if (signupForm) {
 
-    const usernameValue =
-        signupUsername
-            ? signupUsername.value.trim()
-            : "";
+    signupForm.addEventListener(
+        "submit",
+        function (event) {
 
-    const passwordValue =
-        signupPassword
-            ? signupPassword.value
-            : "";
+            event.preventDefault();
 
+            signup();
 
-    if (
-        !usernameValue ||
-        !passwordValue
-    ) {
-
-        showAuthMessage(
-            "Username va parolni kiriting."
-        );
-
-        return;
-    }
-
-
-    if (signupButton) {
-        signupButton.disabled = true;
-    }
-
-
-    showAuthMessage(
-        "Akkaunt yaratilmoqda..."
-    );
-
-
-    try {
-
-        const response =
-            await fetch(
-                "/signup",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        username:
-                            usernameValue,
-
-                        password:
-                            passwordValue
-                    })
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (!data.success) {
-
-            showAuthMessage(
-                data.message ||
-                "Ro‘yxatdan o‘tib bo‘lmadi."
-            );
-
-            return;
         }
-
-
-        userToken =
-            data.user_token;
-
-        username =
-            data.username;
-
-
-        localStorage.setItem(
-            "m3nova_user_token",
-            userToken
-        );
-
-        localStorage.setItem(
-            "m3nova_username",
-            username
-        );
-
-
-        showAuthMessage(
-            "Akkaunt yaratildi.",
-            true
-        );
-
-
-        openApp();
-
-        await loadChats();
-
-        await loadCurrentChat();
-
-
-    } catch (error) {
-
-        console.error(
-            "SIGNUP ERROR:",
-            error
-        );
-showAuthMessage(
-            "Server bilan bog‘lanib bo‘lmadi."
-        );
-
-
-    } finally {
-
-        if (signupButton) {
-            signupButton.disabled = false;
-        }
-
-    }
-
-}
-
-
-if (signupButton) {
-
-    signupButton.addEventListener(
-        "click",
-        signup
     );
 
 }
