@@ -13,93 +13,48 @@ const app = document.getElementById("app");
 const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
 
-const loginUsername =
-    document.getElementById("loginUsername");
+const loginUsername = document.getElementById("loginUsername");
+const loginPassword = document.getElementById("loginPassword");
 
-const loginPassword =
-    document.getElementById("loginPassword");
+const signupUsername = document.getElementById("signupUsername");
+const signupPassword = document.getElementById("signupPassword");
 
-const signupUsername =
-    document.getElementById("signupUsername");
+const loginButton = document.getElementById("loginButton");
+const signupButton = document.getElementById("signupButton");
 
-const signupPassword =
-    document.getElementById("signupPassword");
+const showSignup = document.getElementById("showSignup");
+const showLogin = document.getElementById("showLogin");
 
-const loginButton =
-    document.getElementById("loginButton");
+const authMessage = document.getElementById("authMessage");
 
-const signupButton =
-    document.getElementById("signupButton");
+const chat = document.getElementById("chat");
+const input = document.getElementById("message");
+const sendButton = document.getElementById("sendButton");
+const micButton = document.getElementById("micButton");
 
-const showSignup =
-    document.getElementById("showSignup");
+const newChatButton = document.getElementById("newChatButton");
+const historyButton = document.getElementById("historyButton");
+const closeSidebar = document.getElementById("closeSidebar");
 
-const showLogin =
-    document.getElementById("showLogin");
+const sidebar = document.getElementById("sidebar");
+const chatList = document.getElementById("chatList");
 
-const authMessage =
-    document.getElementById("authMessage");
+const userInfo = document.getElementById("userInfo");
+const logoutButton = document.getElementById("logoutButton");
 
-const chat =
-    document.getElementById("chat");
-
-const input =
-    document.getElementById("message");
-
-const sendButton =
-    document.getElementById("sendButton");
-
-const micButton =
-    document.getElementById("micButton");
-
-const newChatButton =
-    document.getElementById("newChatButton");
-
-const historyButton =
-    document.getElementById("historyButton");
-
-const closeSidebar =
-    document.getElementById("closeSidebar");
-
-const sidebar =
-    document.getElementById("sidebar");
-
-const chatList =
-    document.getElementById("chatList");
-
-const userInfo =
-    document.getElementById("userInfo");
-
-const logoutButton =
-    document.getElementById("logoutButton");
-
-const adminPanel =
-    document.getElementById("adminPanel");
-
-const closeAdminPanel =
-    document.getElementById("closeAdminPanel");
+const adminPanel = document.getElementById("adminPanel");
+const closeAdminPanel = document.getElementById("closeAdminPanel");
 
 
 // ========================================
 // SESSION
 // ========================================
 
-let userToken =
-    localStorage.getItem("m3nova_user_token");
-
-let ownerToken =
-    localStorage.getItem("m3nova_owner_token");
-
-let adminToken =
-    localStorage.getItem("m3nova_admin_token");
-
-let username =
-    localStorage.getItem("m3nova_username");
-
-let currentChatId =
-    localStorage.getItem(
-        "m3nova_current_chat_id"
-    );
+let userToken = localStorage.getItem("m3nova_user_token");
+let ownerToken = localStorage.getItem("m3nova_owner_token");
+let adminToken = localStorage.getItem("m3nova_admin_token");
+let username = localStorage.getItem("m3nova_username");
+let currentChatId = localStorage.getItem("m3nova_current_chat_id");
 
 
 // ========================================
@@ -108,17 +63,14 @@ let currentChatId =
 
 let voiceMode = false;
 let recognition = null;
-let voices = [];
+let availableVoices = [];
 
 
 // ========================================
 // AUTH MESSAGE
 // ========================================
 
-function showAuthMessage(
-    message,
-    success = false
-) {
+function showAuthMessage(message, success = false) {
 
     if (!authMessage) {
         return;
@@ -126,16 +78,11 @@ function showAuthMessage(
 
     authMessage.textContent = message;
 
-    authMessage.classList.remove(
-        "success"
-    );
+    authMessage.classList.remove("success");
 
     if (success) {
-        authMessage.classList.add(
-            "success"
-        );
+        authMessage.classList.add("success");
     }
-
 }
 
 
@@ -146,19 +93,14 @@ function showAuthMessage(
 function showLoginForm() {
 
     if (loginForm) {
-        loginForm.classList.remove(
-            "hidden"
-        );
+        loginForm.classList.remove("hidden");
     }
 
     if (signupForm) {
-        signupForm.classList.add(
-            "hidden"
-        );
+        signupForm.classList.add("hidden");
     }
 
     showAuthMessage("");
-
 }
 
 
@@ -169,95 +111,14 @@ function showLoginForm() {
 function showSignupForm() {
 
     if (loginForm) {
-        loginForm.classList.add(
-            "hidden"
-        );
+        loginForm.classList.add("hidden");
     }
 
     if (signupForm) {
-        signupForm.classList.remove(
-            "hidden"
-        );
+        signupForm.classList.remove("hidden");
     }
 
     showAuthMessage("");
-
-}
-
-
-// ========================================
-// AUTH EVENTS
-// ========================================
-
-if (showSignup) {
-
-    showSignup.addEventListener(
-        "click",
-        function (event) {
-
-            event.preventDefault();
-
-            showSignupForm();
-
-        }
-    );
-
-}
-
-
-if (showLogin) {
-
-    showLogin.addEventListener(
-        "click",
-        function (event) {
-
-            event.preventDefault();
-
-            showLoginForm();
-
-        }
-    );
-
-}
-
-
-// ========================================
-// LOGIN FORM SUBMIT
-// ========================================
-
-if (loginForm) {
-
-    loginForm.addEventListener(
-        "submit",
-        function (event) {
-
-            event.preventDefault();
-
-            login();
-
-        }
-    );
-
-}
-
-
-// ========================================
-// SIGNUP FORM SUBMIT
-// ========================================
-
-if (signupForm) {
-
-    signupForm.addEventListener(
-        "submit",
-        function (event) {
-
-            event.preventDefault();
-
-            signup();
-
-        }
-    );
-
 }
 
 
@@ -268,21 +129,12 @@ if (signupForm) {
 function openAuth() {
 
     if (authScreen) {
-
-        authScreen.classList.remove(
-            "hidden"
-        );
-
+        authScreen.classList.remove("hidden");
     }
 
     if (app) {
-
-        app.classList.add(
-            "hidden"
-        );
-
+        app.classList.add("hidden");
     }
-
 }
 
 
@@ -293,28 +145,270 @@ function openAuth() {
 function openApp() {
 
     if (authScreen) {
-
-        authScreen.classList.add(
-            "hidden"
-        );
-
+        authScreen.classList.add("hidden");
     }
 
     if (app) {
-
-        app.classList.remove(
-            "hidden"
-        );
-
+        app.classList.remove("hidden");
     }
 
     if (userInfo) {
+        userInfo.textContent = username || "User";
+    }
+}
 
-        userInfo.textContent =
-            username || "User";
 
+// ========================================
+// LOGIN
+// ========================================
+
+async function login() {
+const usernameValue = loginUsername
+        ? loginUsername.value.trim()
+        : "";
+
+    const passwordValue = loginPassword
+        ? loginPassword.value
+        : "";
+
+    if (!usernameValue || !passwordValue) {
+
+        showAuthMessage(
+            "Username va parolni kiriting."
+        );
+
+        return;
     }
 
+    if (loginButton) {
+        loginButton.disabled = true;
+    }
+
+    showAuthMessage("Kirilmoqda...");
+
+    try {
+
+        const response = await fetch("/login", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                username: usernameValue,
+                password: passwordValue
+            })
+
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+
+            showAuthMessage(
+                data.message || "Login amalga oshmadi."
+            );
+
+            return;
+        }
+
+        userToken = data.user_token;
+        username = data.username || usernameValue;
+
+        localStorage.setItem(
+            "m3nova_user_token",
+            userToken
+        );
+
+        localStorage.setItem(
+            "m3nova_username",
+            username
+        );
+
+        currentChatId =
+            data.chat_id ||
+            localStorage.getItem(
+                "m3nova_current_chat_id"
+            );
+
+        if (currentChatId) {
+
+            localStorage.setItem(
+                "m3nova_current_chat_id",
+                currentChatId
+            );
+        }
+
+        showAuthMessage(
+            "Muvaffaqiyatli kirildi!",
+            true
+        );
+
+        openApp();
+
+        await loadChats();
+        await loadCurrentChat();
+
+    } catch (error) {
+
+        console.error("LOGIN ERROR:", error);
+
+        showAuthMessage(
+            "Server bilan bog‘lanib bo‘lmadi."
+        );
+
+    } finally {
+
+        if (loginButton) {
+            loginButton.disabled = false;
+        }
+    }
+}
+
+
+// ========================================
+// SIGNUP
+// ========================================
+
+async function signup() {
+
+    const usernameValue = signupUsername
+        ? signupUsername.value.trim()
+        : "";
+
+    const passwordValue = signupPassword
+        ? signupPassword.value
+        : "";
+
+    if (!usernameValue || !passwordValue) {
+
+        showAuthMessage(
+            "Username va parolni kiriting."
+        );
+
+        return;
+    }
+
+    if (signupButton) {
+        signupButton.disabled = true;
+    }
+
+    showAuthMessage("Akkaunt yaratilmoqda...");
+
+    try {
+
+        const response = await fetch("/signup", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                username: usernameValue,
+                password: passwordValue
+            })
+
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+
+            showAuthMessage(
+                data.message || "Ro‘yxatdan o‘tishda xatolik."
+            );
+
+            return;
+        }
+
+        showAuthMessage(
+            "Akkaunt yaratildi! Endi login qiling.",
+            true
+        );
+
+        if (signupPassword) {
+            signupPassword.value = "";
+        }
+
+        showLoginForm();
+
+        if (loginUsername) {
+            loginUsername.value = usernameValue;
+        }
+
+        if (loginPassword) {
+            loginPassword.focus();
+        }
+
+    } catch (error) {
+
+        console.error("SIGNUP ERROR:", error);
+
+        showAuthMessage(
+            "Server bilan bog‘lanib bo‘lmadi."
+        );
+
+    } finally {
+
+        if (signupButton) {
+            signupButton.disabled = false;
+        }
+    }
+}
+
+
+// ========================================
+// AUTH EVENTS
+// ========================================
+
+if (showSignup) {
+
+    showSignup.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        showSignupForm();
+
+    });
+}
+
+
+if (showLogin) {
+showLogin.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        showLoginForm();
+
+    });
+}
+
+
+if (loginForm) {
+
+    loginForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+        login();
+
+    });
+}
+
+
+if (signupForm) {
+
+    signupForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+        signup();
+
+    });
 }
 
 
@@ -322,52 +416,35 @@ function openApp() {
 // ADD MESSAGE
 // ========================================
 
-function addMessage(
-    text,
-    type
-) {
+function addMessage(text, type) {
 
     if (!chat) {
         return;
     }
 
-
     const messageElement =
         document.createElement("div");
-
 
     messageElement.className =
         "message " + type;
 
-
     const content =
         document.createElement("div");
-
 
     content.className =
         "message-content";
 
-
     content.textContent =
         text || "";
 
+    messageElement.appendChild(content);
 
-    messageElement.appendChild(
-        content
-    );
-
-
-    chat.appendChild(
-        messageElement
-    );
-
+    chat.appendChild(messageElement);
 
     chat.scrollTop =
         chat.scrollHeight;
 
-
     return messageElement;
-
 }
 
 
@@ -380,7 +457,6 @@ function clearChat() {
     if (!chat) {
         return;
     }
-
 
     chat.innerHTML = 
         <div class="welcome">
@@ -402,7 +478,6 @@ function clearChat() {
 
         </div>
     ;
-
 }
 
 
@@ -416,43 +491,29 @@ function addTypingMessage() {
         return null;
     }
 
-
     const element =
         document.createElement("div");
-
 
     element.className =
         "message ai";
 
-
     const content =
         document.createElement("div");
-
 
     content.className =
         "message-content";
 
-
     content.textContent =
         "M3NOVA yozmoqda...";
 
+    element.appendChild(content);
 
-    element.appendChild(
-        content
-    );
-
-
-    chat.appendChild(
-        element
-    );
-
+    chat.appendChild(element);
 
     chat.scrollTop =
         chat.scrollHeight;
 
-
     return element;
-
 }
 
 
@@ -466,15 +527,12 @@ async function sendMessage() {
         return;
     }
 
-
     const message =
         input.value.trim();
-
 
     if (!message) {
         return;
     }
-
 
     if (!userToken) {
 
@@ -483,24 +541,18 @@ async function sendMessage() {
         return;
     }
 
-
     // ====================================
     // ADMIN CODE
     // ====================================
 
-    if (
-        message.toUpperCase() === "SUNA"
-    ) {
+    if (message.toUpperCase() === "SUNA") {
 
         input.value = "";
 
-        await sendSpecialMessage(
-            message
-        );
+        await sendSpecialMessage(message);
 
         return;
     }
-
 
     // ====================================
     // NORMAL MESSAGE
@@ -508,48 +560,41 @@ async function sendMessage() {
 
     input.value = "";
 
-    input.style.height =
-        "auto";
-
+    input.style.height = "auto";
 
     if (sendButton) {
         sendButton.disabled = true;
     }
 
-
     const typingMessage =
-        addTypingMessage();
-
+        voiceMode
+            ? null
+            : addTypingMessage();
 
     try {
 
         const response =
-            await fetch(
-                "/chat",
-                {
-                    method: "POST",
+            await fetch("/chat", {
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-body: JSON.stringify({
+                method: "POST",
 
-                        message:
-                            message,
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-                        user_token:
-                            userToken,
+                body: JSON.stringify({
 
-                        owner_token:
-                            ownerToken,
+                    message: message,
 
-                        chat_id:
-                            currentChatId
+                    user_token: userToken,
 
-                    })
-                }
-            );
+                    owner_token: ownerToken,
+
+                    chat_id: currentChatId
+
+                })
+
+            });
 
 
         const data =
@@ -575,7 +620,6 @@ body: JSON.stringify({
                 "m3nova_current_chat_id",
                 currentChatId
             );
-
         }
 
 
@@ -584,18 +628,12 @@ body: JSON.stringify({
         }
 
 
-        // ====================================
-        // VOICE MODE
-        // ====================================
-
         if (voiceMode) {
-
-            if (data.reply) {
+if (data.reply) {
 
                 speakM3NOVA(
                     data.reply
                 );
-
             }
 
         } else {
@@ -605,7 +643,6 @@ body: JSON.stringify({
                 "M3NOVA javob bermadi.",
                 "ai"
             );
-
         }
 
 
@@ -637,7 +674,6 @@ body: JSON.stringify({
             speakM3NOVA(
                 "Server bilan bog‘lanib bo‘lmadi."
             );
-
         }
 
 
@@ -650,9 +686,7 @@ body: JSON.stringify({
         if (input) {
             input.focus();
         }
-
     }
-
 }
 
 
@@ -660,40 +694,32 @@ body: JSON.stringify({
 // SPECIAL MESSAGE
 // ========================================
 
-async function sendSpecialMessage(
-    message
-) {
+async function sendSpecialMessage(message) {
 
     try {
 
         const response =
-            await fetch(
-                "/chat",
-                {
-                    method: "POST",
+            await fetch("/chat", {
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                method: "POST",
 
-                    body: JSON.stringify({
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-                        message:
-                            message,
+                body: JSON.stringify({
 
-                        user_token:
-                            userToken,
+                    message: message,
 
-                        owner_token:
-                            ownerToken,
+                    user_token: userToken,
 
-                        chat_id:
-                            currentChatId
+                    owner_token: ownerToken,
 
-                    })
-                }
-            );
+                    chat_id: currentChatId
+
+                })
+
+            });
 
 
         const data =
@@ -709,9 +735,12 @@ async function sendSpecialMessage(
                 "m3nova_current_chat_id",
                 currentChatId
             );
-
         }
 
+
+        // ====================================
+        // ADMIN AUTH
+        // ====================================
 
         if (data.admin_authenticated) {
 
@@ -729,7 +758,6 @@ async function sendSpecialMessage(
                 adminPanel.classList.remove(
                     "hidden"
                 );
-
             }
 
 
@@ -738,6 +766,10 @@ async function sendSpecialMessage(
             return;
         }
 
+
+        // ====================================
+        // OWNER AUTH
+        // ====================================
 
         if (data.owner_authenticated) {
 
@@ -767,20 +799,17 @@ async function sendSpecialMessage(
                     data.reply,
                     "ai"
                 );
-
             }
-
         }
 
 
     } catch (error) {
-console.error(
+
+        console.error(
             "SPECIAL MESSAGE ERROR:",
             error
         );
-
     }
-
 }
 
 
@@ -800,7 +829,6 @@ if (sendButton) {
 
         }
     );
-
 }
 
 
@@ -824,9 +852,7 @@ if (input) {
                 voiceMode = false;
 
                 sendMessage();
-
             }
-
         }
     );
 
@@ -835,18 +861,14 @@ if (input) {
         "input",
         function () {
 
-            this.style.height =
-                "auto";
-
-            this.style.height =
+            this.style.height = "auto";
+this.style.height =
                 Math.min(
                     this.scrollHeight,
                     150
                 ) + "px";
-
         }
     );
-
 }
 
 
@@ -860,28 +882,24 @@ async function createNewChat() {
         return;
     }
 
-
     try {
 
         const response =
-            await fetch(
-                "/new-chat",
-                {
-                    method: "POST",
+            await fetch("/new-chat", {
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                method: "POST",
 
-                    body: JSON.stringify({
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-                        user_token:
-                            userToken
+                body: JSON.stringify({
 
-                    })
-                }
-            );
+                    user_token: userToken
+
+                })
+
+            });
 
 
         const data =
@@ -911,9 +929,10 @@ async function createNewChat() {
             sidebar.classList.remove(
                 "show"
             );
-
         }
 
+
+        await loadChats();
 
     } catch (error) {
 
@@ -921,9 +940,7 @@ async function createNewChat() {
             "NEW CHAT ERROR:",
             error
         );
-
     }
-
 }
 
 
@@ -933,7 +950,6 @@ if (newChatButton) {
         "click",
         createNewChat
     );
-
 }
 
 
@@ -949,186 +965,62 @@ async function loadChats() {
 
     try {
 
-        const response = await fetch(
-            "/chats?user_token=" +
-            encodeURIComponent(userToken)
-        );
+        const response = await fetch("/chats", {
+            headers: {
+                "Authorization": "Bearer " + userToken
+            }
+        });
 
         const data = await response.json();
 
-        if (!data.success) {
+        if (!response.ok) {
+            console.error("LOAD CHATS ERROR:", data);
             return;
         }
 
         chatList.innerHTML = "";
 
-        if (!data.chats || data.chats.length === 0) {
+        const chats = Array.isArray(data.chats)
+            ? data.chats
+            : [];
 
-            chatList.innerHTML = 
-                <div class="empty-chats">
-                    Hozircha chatlar yo'q
-                </div>
-            ;
+        if (chats.length === 0) {
+
+            chatList.innerHTML =
+                '<div class="empty-chats">Hali chatlar mavjud emas</div>';
 
             return;
         }
 
-        data.chats.forEach(
-            function (item) {
+        chats.forEach(function(chat) {
 
-                const chatItem =
-                    document.createElement("div");
+            const item = document.createElement("div");
 
-                chatItem.className =
-                    "chat-item";
+            item.className = "chat-item";
 
-                chatItem.textContent =
-                    item.title ||
-                    "New Chat";
+            item.innerHTML =
+                '<div class="chat-item-title">' +
+                (chat.title || "Yangi chat") +
+                '</div>';
 
-                chatItem.addEventListener(
-                    "click",
-                    async function () {
+            item.addEventListener("click", function() {
 
-                        currentChatId =
-                            item.chat_id;
-
-                        localStorage.setItem(
-                            "m3nova_current_chat_id",
-                            currentChatId
-                        );
-
-                        await loadCurrentChat();
-
-                        if (sidebar) {
-
-                            sidebar.classList.remove(
-                                "show"
-                            );
-
-                        }
-
-                    }
-                );
-
-                chatList.appendChild(
-                    chatItem
-                );
-
-            }
-        );
-
-    } catch (error) {
-
-        console.error(
-            "LOAD CHATS ERROR:",
-            error
-        );
-
-    }
-
-}
-
-
-// ========================================
-// LOAD CURRENT CHAT
-// ========================================
-
-async function loadCurrentChat() {
-
-    if (!userToken || !currentChatId) {
-
-        clearChat();
-
-        return;
-    }
-
-
-    try {
-
-        const response =
-            await fetch(
-                "/history?user_token=" +
-                encodeURIComponent(userToken) +
-                "&chat_id=" +
-                encodeURIComponent(currentChatId)
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (
-            data.success &&
-            data.messages &&
-            data.messages.length > 0
-        ) {
-
-            chat.innerHTML = "";
-
-
-            data.messages.forEach(
-                function (item) {
-
-                    const type =
-                        item.role === "user"
-                            ? "user"
-                            : "ai";
-
-
-                    addMessage(
-                        item.content,
-                        type
-                    );
-
+                if (chat.id) {
+                    currentChatId = chat.id;
+                    loadCurrentChat();
                 }
-            );
 
+            });
 
-        } else {
+            chatList.appendChild(item);
 
-            clearChat();
-
-        }
-
+        });
 
     } catch (error) {
 
-        console.error(
-            "LOAD CURRENT CHAT ERROR:",
-            error
-        );
-
-
-        clearChat();
+        console.error("LOAD CHATS ERROR:", error);
 
     }
-
-}
-
-
-// ========================================
-// HISTORY BUTTON
-// ========================================
-
-if (historyButton) {
-
-    historyButton.addEventListener(
-        "click",
-        function () {
-
-            if (sidebar) {
-
-                sidebar.classList.toggle(
-                    "show"
-                );
-
-            }
-
-        }
-    );
-
 }
 
 
@@ -1140,7 +1032,9 @@ if (closeSidebar) {
 
     closeSidebar.addEventListener(
         "click",
-        function () {
+        function (event) {
+
+            event.preventDefault();
 
             if (sidebar) {
 
@@ -1185,7 +1079,6 @@ async function logout() {
 
     }
 
-
     clearLocalSession();
 
     clearChat();
@@ -1221,7 +1114,6 @@ function clearLocalSession() {
         "m3nova_current_chat_id"
     );
 
-
     userToken = null;
 
     ownerToken = null;
@@ -1243,7 +1135,13 @@ if (logoutButton) {
 
     logoutButton.addEventListener(
         "click",
-        logout
+        function (event) {
+
+            event.preventDefault();
+
+            logout();
+
+        }
     );
 
 }
@@ -1261,12 +1159,15 @@ async function loadAdminStats() {
 
     try {
 
-        const response = await fetch(
-            "/admin/stats?admin_token=" +
-            encodeURIComponent(adminToken)
-        );
+        const response =
+            await fetch(
+                "/admin/stats?admin_token=" +
+                encodeURIComponent(adminToken)
+            );
 
-        const data = await response.json();
+        const data =
+            await response.json();
+
 
         if (data.error) {
 
@@ -1274,9 +1175,9 @@ async function loadAdminStats() {
                 "ADMIN ERROR:",
                 data.error
             );
-
-            return;
+return;
         }
+
 
         const totalVisitors =
             document.getElementById(
@@ -1290,6 +1191,7 @@ async function loadAdminStats() {
 
         }
 
+
         const onlineNow =
             document.getElementById(
                 "onlineNow"
@@ -1302,6 +1204,7 @@ async function loadAdminStats() {
 
         }
 
+
         const totalUsers =
             document.getElementById(
                 "totalUsers"
@@ -1313,6 +1216,7 @@ async function loadAdminStats() {
                 data.total_users ?? 0;
 
         }
+
 
         const countriesList =
             document.getElementById(
@@ -1347,6 +1251,7 @@ async function loadAdminStats() {
             }
 
         }
+
 
         const devicesList =
             document.getElementById(
@@ -1393,6 +1298,7 @@ async function loadAdminStats() {
 
 }
 
+
 // ========================================
 // CLOSE ADMIN PANEL
 // ========================================
@@ -1401,7 +1307,9 @@ if (closeAdminPanel) {
 
     closeAdminPanel.addEventListener(
         "click",
-        function () {
+        function (event) {
+
+            event.preventDefault();
 
             if (adminPanel) {
 
@@ -1421,18 +1329,15 @@ if (closeAdminPanel) {
 // VOICE SYSTEM
 // ========================================
 
-let availableVoices = [];
-
-
 function loadVoices() {
 
     if (
         typeof speechSynthesis ===
         "undefined"
     ) {
+
         return;
     }
-
 
     availableVoices =
         speechSynthesis.getVoices();
@@ -1446,7 +1351,6 @@ if (
 ) {
 
     loadVoices();
-
 
     speechSynthesis.onvoiceschanged =
         loadVoices;
@@ -1470,7 +1374,7 @@ function getUzbekVoice() {
     }
 
 
-    let voice =
+    const voice =
         availableVoices.find(
             function (item) {
 
@@ -1485,12 +1389,7 @@ function getUzbekVoice() {
         );
 
 
-    if (voice) {
-        return voice;
-    }
-
-
-    return null;
+    return voice || null;
 
 }
 
@@ -1546,10 +1445,8 @@ if (!text) {
     utterance.rate =
         0.92;
 
-
     utterance.pitch =
         1.0;
-
 
     utterance.volume =
         1.0;
@@ -1598,7 +1495,10 @@ if (
 
     micButton.addEventListener(
         "click",
-        function () {
+        function (event) {
+
+            event.preventDefault();
+
 
             if (!userToken) {
 
@@ -1623,9 +1523,7 @@ if (
 
                 voiceMode = true;
 
-
                 recognition.start();
-
 
             } catch (error) {
 
@@ -1689,12 +1587,6 @@ if (
             }
 
 
-            // ====================================
-            // OVOZLI XABAR
-            // Matn inputga yozilmaydi
-            // Chatda ko‘rsatilmaydi
-            // ====================================
-
             try {
 
                 const response =
@@ -1751,15 +1643,17 @@ if (
 
                     currentChatId =
                         data.chat_id;
-localStorage.setItem(
+
+
+                    localStorage.setItem(
                         "m3nova_current_chat_id",
                         currentChatId
                     );
 
                 }
-
-
-                // Faqat ovozli javob
+// ====================================
+                // FAQAT OVOZLI JAVOB
+                // ====================================
 
                 if (data.reply) {
 
@@ -1816,6 +1710,7 @@ localStorage.setItem(
             }
 
         };
+
 
 } else {
 
